@@ -1,23 +1,25 @@
-FROM node:20-slim
+# ---- Base image ----
+FROM node:22-alpine
 
 # Enable pnpm
-RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
+RUN corepack enable
 
-# System deps
-RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
-
+# Set working directory
 WORKDIR /app
 
-# Copy entire monorepo
-COPY . .
+# ---- Copy workspace root files ----
+COPY ../../package.json ../../pnpm-lock.yaml ../../pnpm-workspace.yaml ./
 
-# Install workspace dependencies
+# ---- Copy workspace packages ----
+COPY ../../apps ./apps
+COPY ../../packages ./packages
+
+# ---- Install deps (frozen lockfile will now work) ----
 RUN pnpm install --frozen-lockfile
 
-# Build only Stripe app
-RUN pnpm --filter @saleor/app-stripe build
+# ---- Build Stripe app only ----
+RUN pnpm --filter @saleor/stripe build
 
+# ---- Start Stripe app ----
 EXPOSE 3000
-
-# Start Stripe app
-CMD ["pnpm", "--filter", "@saleor/app-stripe", "start"]
+CMD ["pnpm", "--filter", "@saleor/stripe", "start"]
