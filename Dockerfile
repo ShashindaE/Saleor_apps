@@ -4,19 +4,22 @@ RUN corepack enable
 
 WORKDIR /app
 
-# Copy workspace files
+# Copy workspace root files
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+# Copy monorepo sources
 COPY apps ./apps
 COPY packages ./packages
 
-# Install deps
+# Install dependencies
 RUN pnpm install --frozen-lockfile
 
-# Build Stripe app
+# Build ONLY the Stripe app
 RUN pnpm --filter "apps/stripe..." build
 
-# Expose port
+# Expose Next.js port
 EXPOSE 3000
 
-# Run Stripe app directly (NO pnpm, NO turbo)
-CMD ["node", "apps/stripe/dist/index.js"]
+# Start Stripe app using Next.js
+WORKDIR /app/apps/stripe
+CMD ["pnpm", "start"]
