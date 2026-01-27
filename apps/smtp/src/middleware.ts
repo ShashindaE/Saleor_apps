@@ -4,6 +4,8 @@ export function middleware(request: NextRequest) {
     const requestHeaders = new Headers(request.headers);
     const pmtradersApiUrl = requestHeaders.get("pmtraders-api-url");
     const pmtradersDomain = requestHeaders.get("pmtraders-domain");
+    const pmtradersEvent = requestHeaders.get("pmtraders-event");
+    const pmtradersSignature = requestHeaders.get("pmtraders-signature");
 
     if (pmtradersApiUrl) {
         requestHeaders.set("saleor-api-url", pmtradersApiUrl);
@@ -11,6 +13,14 @@ export function middleware(request: NextRequest) {
 
     if (pmtradersDomain) {
         requestHeaders.set("saleor-domain", pmtradersDomain);
+    }
+
+    if (pmtradersEvent) {
+        requestHeaders.set("saleor-event", pmtradersEvent);
+    }
+
+    if (pmtradersSignature) {
+        requestHeaders.set("saleor-signature", pmtradersSignature);
     }
 
     /*
