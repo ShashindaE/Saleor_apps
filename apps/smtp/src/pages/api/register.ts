@@ -78,6 +78,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   console.log("Method:", req.method);
   console.log("Headers:", JSON.stringify(req.headers, null, 2));
 
+  // CORRECTION: Map "pmtraders-" headers to "saleor-" headers so the SDK can recognize them
+  if (req.headers["pmtraders-api-url"]) {
+    console.log("--- DETECTED CUSTOM HEADER: Replacing pmtraders-api-url with saleor-api-url ---");
+    req.headers["saleor-api-url"] = req.headers["pmtraders-api-url"];
+  }
+  if (req.headers["pmtraders-domain"]) {
+    req.headers["saleor-domain"] = req.headers["pmtraders-domain"];
+  }
+
   // Forward to SDK handler
   return sdkHandler(req, res);
 }
