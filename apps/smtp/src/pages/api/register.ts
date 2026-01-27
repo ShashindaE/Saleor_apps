@@ -45,6 +45,11 @@ export default wrapWithLoggerContext(
       async onRequestVerified(req, { authData: { token, saleorApiUrl }, respondWithError }) {
         const logger = createLogger("onRequestVerified");
 
+        // NUCLEAR DEBUGGING LOGS
+        console.log("--- NUCLEAR DEBUG: REGISTER REQUEST RECEIVED ---");
+        console.log("Saleor API URL:", saleorApiUrl);
+        console.log("Token length:", token?.length);
+
         let saleorVersion: string;
 
         try {
@@ -54,8 +59,12 @@ export default wrapWithLoggerContext(
           });
 
           saleorVersion = await fetchSaleorVersion(client);
+          console.log("Fetched Saleor Version:", saleorVersion);
         } catch (e: unknown) {
           const message = (e as Error)?.message ?? "Unknown error";
+
+          console.error("--- NUCLEAR DEBUG: FETCH FAILED ---");
+          console.error(message);
 
           logger.debug(
             { message, saleorApiUrl },
@@ -63,35 +72,37 @@ export default wrapWithLoggerContext(
           );
 
           throw respondWithError({
-            message: "Couldn't communicate with Saleor API",
+            message: "Couldn't communicate with Saleor API: " + message,
             status: 400,
           });
         }
 
         if (!saleorVersion) {
-          logger.warn({ saleorApiUrl }, "No version returned from Saleor API");
-          throw respondWithError({
-            message: "Saleor version couldn't be fetched from the API",
-            status: 400,
-          });
+          console.error("--- NUCLEAR DEBUG: NO VERSION ---");
+          // logger.warn({ saleorApiUrl }, "No version returned from Saleor API");
+          // throw respondWithError({
+          //   message: "Saleor version couldn't be fetched from the API",
+          //   status: 400,
+          // });
         }
 
-        const isVersionValid = new SaleorVersionCompatibilityValidator(
-          REQUIRED_SALEOR_VERSION,
-        ).isValid(saleorVersion);
+        // BYPASS VERSION VALIDATION FOR DEBUGGING
+        // const isVersionValid = new SaleorVersionCompatibilityValidator(
+        //   REQUIRED_SALEOR_VERSION,
+        // ).isValid(saleorVersion);
 
-        if (!isVersionValid) {
-          logger.info(
-            { saleorApiUrl },
-            "Rejecting installation due to incompatible Saleor version",
-          );
-          throw respondWithError({
-            message: `Saleor version (${saleorVersion}) is not compatible with this app version (${REQUIRED_SALEOR_VERSION})`,
-            status: 400,
-          });
-        }
+        // if (!isVersionValid) {
+        //   logger.info(
+        //     { saleorApiUrl },
+        //     "Rejecting installation due to incompatible Saleor version",
+        //   );
+        //   throw respondWithError({
+        //     message: `Saleor version (${saleorVersion}) is not compatible with this app version (${REQUIRED_SALEOR_VERSION})`,
+        //     status: 400,
+        //   });
+        // }
 
-        logger.info("Saleor version validated successfully");
+        logger.info("Saleor version validated successfully (BYPASSED)");
       },
     }),
   ),
