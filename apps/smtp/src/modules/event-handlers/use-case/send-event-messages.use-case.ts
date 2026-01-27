@@ -265,10 +265,11 @@ export class SendEventMessagesUseCase {
 
       if (order && Array.isArray(order.lines)) {
         order.lines = order.lines.map((line: any) => {
-          const isWeighted = line.variant?.product?.productType?.measurementType === "WEIGHTED";
+          const measurementType = line.variant?.product?.productType?.measurementType;
+          const isWeighted = measurementType === "WEIGHT" || measurementType === "WEIGHTED";
 
           // eslint-disable-next-line no-console
-          console.log(`[Enrich] Line: ${line.productName}, Variant: ${line.variant?.name}, Type: ${line.variant?.product?.productType?.measurementType}, IsWeighted: ${isWeighted}`);
+          console.log(`[Enrich] Line: ${line.productName}, Type: ${measurementType}, IsWeighted: ${isWeighted}`);
 
           const quantity = line.quantity ?? 0;
           let formattedQuantity = quantity.toString();
