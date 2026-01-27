@@ -10,6 +10,7 @@ import { mockedAtobaraiTransactionId } from "@/__tests__/mocks/atobarai/mocked-a
 import { mockedSaleorApiUrl } from "@/__tests__/mocks/saleor/mocked-saleor-api-url";
 import { mockedSaleorAppId } from "@/__tests__/mocks/saleor/mocked-saleor-app-id";
 import { mockedRefundRequestedEvent } from "@/__tests__/mocks/saleor-events/mocked-refund-requested-event";
+import { TransactionRefundRequestedEventFragment } from "@/generated/graphql";
 import { createAtobaraiCancelTransactionSuccessResponse } from "@/modules/atobarai/api/atobarai-cancel-transaction-success-response";
 import { createAtobaraiFulfillmentReportSuccessResponse } from "@/modules/atobarai/api/atobarai-fulfillment-report-success-response";
 import { createAtobaraiTransactionSuccessResponse } from "@/modules/atobarai/api/atobarai-transaction-success-response";
@@ -25,7 +26,6 @@ import {
 } from "@/modules/transaction-result/refund-result";
 import { TransactionRecord } from "@/modules/transactions-recording/transaction-record";
 
-import { MalformedRequestResponse } from "../saleor-webhook-responses";
 import { TransactionRefundRequestedUseCase } from "./use-case";
 import { TransactionRefundRequestedUseCaseResponse } from "./use-case-response";
 
@@ -34,7 +34,7 @@ describe("TransactionRefundRequestedUseCase", () => {
     create: () => mockedAtobaraiApiClient,
   } satisfies IAtobaraiApiClientFactory;
 
-  it("should return MalformedRequestResponse when action amount is missing", async () => {
+  it("should return REFUND_FAILURE when action amount is missing", async () => {
     const event = {
       ...mockedRefundRequestedEvent,
       action: { amount: null, currency: "JPY" },
@@ -53,10 +53,18 @@ describe("TransactionRefundRequestedUseCase", () => {
       saleorApiUrl: mockedSaleorApiUrl,
     });
 
-    expect(result._unsafeUnwrapErr()).toBeInstanceOf(MalformedRequestResponse);
+    expect(await result._unsafeUnwrap().getResponse().json()).toMatchInlineSnapshot(`
+      {
+        "actions": [
+          "REFUND",
+        ],
+        "message": "Failed to process NP Atobarai transaction refund: missing required data for refund",
+        "result": "REFUND_FAILURE",
+      }
+    `);
   });
 
-  it("should return MalformedRequestResponse when transaction is missing", async () => {
+  it("should return REFUND_FAILURE when transaction is missing", async () => {
     const event = {
       ...mockedRefundRequestedEvent,
       transaction: null,
@@ -74,15 +82,28 @@ describe("TransactionRefundRequestedUseCase", () => {
       saleorApiUrl: mockedSaleorApiUrl,
     });
 
-    expect(result._unsafeUnwrapErr()).toBeInstanceOf(MalformedRequestResponse);
+    expect(await result._unsafeUnwrap().getResponse().json()).toMatchInlineSnapshot(
+      `
+      {
+        "actions": [
+          "REFUND",
+        ],
+        "message": "Failed to process NP Atobarai transaction refund: missing required data for refund",
+        "result": "REFUND_FAILURE",
+      }
+    `,
+    );
   });
 
-  it("should return MalformedRequestResponse when total amount is missing from both checkout and order", async () => {
-    const event = {
+  it("should return REFUND_FAILURE when transaction total amount is missing from both checkout and order", async () => {
+    const event: TransactionRefundRequestedEventFragment = {
       ...mockedRefundRequestedEvent,
       transaction: {
+        ...mockedRefundRequestedEvent.transaction,
         pspReference: mockedAtobaraiTransactionId,
         token: "saleor-transaction-token",
+        // @ts-expect-error - for testing
+        chargedAmount: null,
       },
     };
 
@@ -98,7 +119,17 @@ describe("TransactionRefundRequestedUseCase", () => {
       saleorApiUrl: mockedSaleorApiUrl,
     });
 
-    expect(result._unsafeUnwrapErr()).toBeInstanceOf(MalformedRequestResponse);
+    expect(await result._unsafeUnwrap().getResponse().json()).toMatchInlineSnapshot(
+      `
+      {
+        "actions": [
+          "REFUND",
+        ],
+        "message": "Failed to process NP Atobarai transaction refund: missing required data for refund",
+        "result": "REFUND_FAILURE",
+      }
+    `,
+    );
   });
 
   describe("before fulfillment refunds", () => {
@@ -284,11 +315,13 @@ describe("TransactionRefundRequestedUseCase", () => {
                   country: {
                     code: "JP",
                   },
-                  postalCode: "1234567",
+                  postalCode: "1000001",
                   countryArea: "Tokyo",
                   streetAddress1: "1-1-1 Shibuya",
                   streetAddress2: "Apt 101",
                   companyName: "Test Company",
+                  city: "Tokyo",
+                  cityArea: "Shibuya",
                 },
                 shippingAddress: {
                   firstName: "John",
@@ -297,11 +330,13 @@ describe("TransactionRefundRequestedUseCase", () => {
                   country: {
                     code: "JP",
                   },
-                  postalCode: "1234567",
+                  postalCode: "1000001",
                   countryArea: "Tokyo",
                   streetAddress1: "1-1-1 Shibuya",
                   streetAddress2: "Apt 101",
                   companyName: "Test Company",
+                  city: "Tokyo",
+                  cityArea: "Shibuya",
                 },
                 userEmail: "test@example.com",
               },
@@ -464,11 +499,13 @@ describe("TransactionRefundRequestedUseCase", () => {
                   country: {
                     code: "JP",
                   },
-                  postalCode: "1234567",
+                  postalCode: "1000001",
                   countryArea: "Tokyo",
                   streetAddress1: "1-1-1 Shibuya",
                   streetAddress2: "Apt 101",
                   companyName: "Test Company",
+                  city: "Tokyo",
+                  cityArea: "Shibuya",
                 },
                 shippingAddress: {
                   firstName: "John",
@@ -477,11 +514,13 @@ describe("TransactionRefundRequestedUseCase", () => {
                   country: {
                     code: "JP",
                   },
-                  postalCode: "1234567",
+                  postalCode: "1000001",
                   countryArea: "Tokyo",
                   streetAddress1: "1-1-1 Shibuya",
                   streetAddress2: "Apt 101",
                   companyName: "Test Company",
+                  city: "Tokyo",
+                  cityArea: "Shibuya",
                 },
                 userEmail: "test@example.com",
               },
@@ -576,19 +615,19 @@ describe("TransactionRefundRequestedUseCase", () => {
                   shop_transaction_id: "saleor-transaction-token",
                   billed_amount: 2500,
                   customer: {
-                    address: "Tokyo1-1-1 ShibuyaApt 101",
+                    address: "Tokyo千代田区千代田1-1-1 ShibuyaApt 101",
                     company_name: "Test Company",
                     customer_name: "Doe John",
                     email: "test@example.com",
                     tel: "0123456789",
-                    zip_code: "1234567",
+                    zip_code: "1000001",
                   },
                   dest_customer: {
-                    address: "Tokyo1-1-1 ShibuyaApt 101",
+                    address: "Tokyo千代田区千代田1-1-1 ShibuyaApt 101",
                     company_name: "Test Company",
                     customer_name: "Doe John",
                     tel: "0123456789",
-                    zip_code: "1234567",
+                    zip_code: "1000001",
                   },
                 },
               ],
@@ -649,11 +688,13 @@ describe("TransactionRefundRequestedUseCase", () => {
                   country: {
                     code: "JP",
                   },
-                  postalCode: "1234567",
+                  postalCode: "1000001",
                   countryArea: "Tokyo",
                   streetAddress1: "1-1-1 Shibuya",
                   streetAddress2: "Apt 101",
                   companyName: "Test Company",
+                  city: "Tokyo",
+                  cityArea: "Shibuya",
                 },
                 shippingAddress: {
                   firstName: "John",
@@ -662,11 +703,13 @@ describe("TransactionRefundRequestedUseCase", () => {
                   country: {
                     code: "JP",
                   },
-                  postalCode: "1234567",
+                  postalCode: "1000001",
                   countryArea: "Tokyo",
                   streetAddress1: "1-1-1 Shibuya",
                   streetAddress2: "Apt 101",
+                  city: "Tokyo",
                   companyName: "Test Company",
+                  cityArea: "Shibuya",
                 },
                 userEmail: "test@example.com",
               },
@@ -734,11 +777,11 @@ describe("TransactionRefundRequestedUseCase", () => {
               transactions: [
                 {
                   dest_customer: {
-                    address: "Tokyo1-1-1 ShibuyaApt 101",
+                    address: "Tokyo千代田区千代田1-1-1 ShibuyaApt 101",
                     company_name: "Test Company",
                     customer_name: "Doe John",
                     tel: "0123456789",
-                    zip_code: "1234567",
+                    zip_code: "1000001",
                   },
                   billed_amount: 1300,
                   settlement_type: "02",
@@ -746,12 +789,12 @@ describe("TransactionRefundRequestedUseCase", () => {
                   shop_transaction_id: "saleor-transaction-token",
                   np_transaction_id: mockedAtobaraiTransactionId,
                   customer: {
-                    address: "Tokyo1-1-1 ShibuyaApt 101",
+                    address: "Tokyo千代田区千代田1-1-1 ShibuyaApt 101",
                     company_name: "Test Company",
                     customer_name: "Doe John",
                     email: "test@example.com",
                     tel: "0123456789",
-                    zip_code: "1234567",
+                    zip_code: "1000001",
                   },
                   goods: [
                     {
@@ -836,11 +879,13 @@ describe("TransactionRefundRequestedUseCase", () => {
                   country: {
                     code: "JP",
                   },
-                  postalCode: "1234567",
+                  postalCode: "1000001",
                   countryArea: "Tokyo",
                   streetAddress1: "1-1-1 Shibuya",
                   streetAddress2: "Apt 101",
                   companyName: "Test Company",
+                  city: "Tokyo",
+                  cityArea: "Shibuya",
                 },
                 shippingAddress: {
                   firstName: "John",
@@ -849,11 +894,13 @@ describe("TransactionRefundRequestedUseCase", () => {
                   country: {
                     code: "JP",
                   },
-                  postalCode: "1234567",
+                  postalCode: "1000001",
                   countryArea: "Tokyo",
                   streetAddress1: "1-1-1 Shibuya",
                   streetAddress2: "Apt 101",
                   companyName: "Test Company",
+                  city: "Tokyo",
+                  cityArea: "Shibuya",
                 },
                 userEmail: "test@example.com",
               },
@@ -1088,11 +1135,13 @@ describe("TransactionRefundRequestedUseCase", () => {
                 country: {
                   code: "JP",
                 },
-                postalCode: "1234567",
+                postalCode: "1000001",
                 countryArea: "Tokyo",
                 streetAddress1: "1-1-1 Shibuya",
                 streetAddress2: "Apt 101",
                 companyName: "Test Company",
+                city: "Tokyo",
+                cityArea: "Shibuya",
               },
               shippingAddress: {
                 firstName: "John",
@@ -1101,11 +1150,13 @@ describe("TransactionRefundRequestedUseCase", () => {
                 country: {
                   code: "JP",
                 },
-                postalCode: "1234567",
+                postalCode: "1000001",
                 countryArea: "Tokyo",
                 streetAddress1: "1-1-1 Shibuya",
                 streetAddress2: "Apt 101",
                 companyName: "Test Company",
+                city: "Tokyo",
+                cityArea: "Shibuya",
               },
               userEmail: "test@example.com",
             },
@@ -1228,11 +1279,13 @@ describe("TransactionRefundRequestedUseCase", () => {
                 country: {
                   code: "JP",
                 },
-                postalCode: "1234567",
+                postalCode: "1000001",
                 countryArea: "Tokyo",
                 streetAddress1: "1-1-1 Shibuya",
                 streetAddress2: "Apt 101",
                 companyName: "Test Company",
+                city: "Tokyo",
+                cityArea: "Shibuya",
               },
               shippingAddress: {
                 firstName: "John",
@@ -1241,11 +1294,13 @@ describe("TransactionRefundRequestedUseCase", () => {
                 country: {
                   code: "JP",
                 },
-                postalCode: "1234567",
+                postalCode: "1000001",
                 countryArea: "Tokyo",
                 streetAddress1: "1-1-1 Shibuya",
                 streetAddress2: "Apt 101",
                 companyName: "Test Company",
+                city: "Tokyo",
+                cityArea: "Shibuya",
               },
               userEmail: "test@example.com",
             },
@@ -1337,11 +1392,13 @@ describe("TransactionRefundRequestedUseCase", () => {
                 country: {
                   code: "JP",
                 },
-                postalCode: "1234567",
+                postalCode: "1000001",
                 countryArea: "Tokyo",
                 streetAddress1: "1-1-1 Shibuya",
                 streetAddress2: "Apt 101",
                 companyName: "Test Company",
+                city: "Tokyo",
+                cityArea: "Shibuya",
               },
               shippingAddress: {
                 firstName: "John",
@@ -1350,11 +1407,13 @@ describe("TransactionRefundRequestedUseCase", () => {
                 country: {
                   code: "JP",
                 },
-                postalCode: "1234567",
+                postalCode: "1000001",
                 countryArea: "Tokyo",
                 streetAddress1: "1-1-1 Shibuya",
                 streetAddress2: "Apt 101",
                 companyName: "Test Company",
+                city: "Tokyo",
+                cityArea: "Shibuya",
               },
               userEmail: "test@example.com",
             },
@@ -1493,11 +1552,13 @@ describe("TransactionRefundRequestedUseCase", () => {
                 country: {
                   code: "JP",
                 },
-                postalCode: "1234567",
+                postalCode: "1000001",
                 countryArea: "Tokyo",
                 streetAddress1: "1-1-1 Shibuya",
                 streetAddress2: "Apt 101",
                 companyName: "Test Company",
+                city: "Tokyo",
+                cityArea: "Shibuya",
               },
               shippingAddress: {
                 firstName: "John",
@@ -1506,11 +1567,13 @@ describe("TransactionRefundRequestedUseCase", () => {
                 country: {
                   code: "JP",
                 },
-                postalCode: "1234567",
+                postalCode: "1000001",
                 countryArea: "Tokyo",
                 streetAddress1: "1-1-1 Shibuya",
                 streetAddress2: "Apt 101",
                 companyName: "Test Company",
+                city: "Tokyo",
+                cityArea: "Shibuya",
               },
               userEmail: "test@example.com",
             },

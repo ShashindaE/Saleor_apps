@@ -1,5 +1,44 @@
 # saleor-app-klaviyo
 
+## 1.14.5
+
+### Patch Changes
+
+- 560c3de4: Added logging to DynamoDB APL for better debugging and error visibility.
+
+## 1.14.4
+
+### Patch Changes
+
+- 2a4f27ad: Fixed how AWS sdk is initialized by explicitly passing credentials. This is caused by Vercel issue, which started to implicitly override some of our credentials by injecting their own.
+
+## 1.14.3
+
+### Patch Changes
+
+- 9e17703c: Updated tTRPC to 10.45.3
+
+## 1.14.2
+
+### Patch Changes
+
+- Updated dependencies [37b91c88]
+  - @saleor/apps-otel@2.4.0
+  - @saleor/apps-logger@1.6.3
+
+## 1.14.1
+
+### Patch Changes
+
+- 98459d79: Updated Next.js to 15.2.6
+- b1f10da0: Added logs when app fails to install due to error in APL, or due to disallowed domain and when app installs successfully
+- Updated dependencies [98459d79]
+  - @saleor/apps-logger@1.6.2
+  - @saleor/apps-otel@2.3.1
+  - @saleor/sentry-utils@0.2.5
+  - @saleor/apps-shared@1.14.1
+  - @saleor/apps-ui@1.3.2
+
 ## 1.14.0
 
 ### Minor Changes

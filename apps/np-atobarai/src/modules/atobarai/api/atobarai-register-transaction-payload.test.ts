@@ -29,19 +29,19 @@ describe("createAtobaraiRegisterTransactionPayload", () => {
           {
             "billed_amount": 1000,
             "customer": {
-              "address": "BillingCountryAreaBillingStreetAddress1BillingStreetAddress2",
+              "address": "BillingCountryArea千代田区千代田BillingStreetAddress1BillingStreetAddress2",
               "company_name": "BillingCompanyName",
               "customer_name": "BillingLastName BillingFirstName",
               "email": "source-object@email.com",
               "tel": "0billingPhone",
-              "zip_code": "BillingPostalCode",
+              "zip_code": "1000001",
             },
             "dest_customer": {
-              "address": "ShippingCountryAreaShippingStreetAddress1ShippingStreetAddress2",
+              "address": "ShippingCountryArea千代田区千代田ShippingStreetAddress1ShippingStreetAddress2",
               "company_name": "ShippingCompanyName",
               "customer_name": "ShippingLastName ShippingFirstName",
               "tel": "0shippingPhone",
-              "zip_code": "ShippingPostalCode",
+              "zip_code": "1000001",
             },
             "goods": [
               {
@@ -69,7 +69,7 @@ describe("createAtobaraiRegisterTransactionPayload", () => {
     `);
   });
 
-  it("should throw ZodError when date is in wrong format", () => {
+  it("should throw validation error when date is in wrong format", () => {
     expect(() =>
       createAtobaraiRegisterTransactionPayload({
         saleorTransactionToken: mockedSaleorTransactionToken,
@@ -81,7 +81,7 @@ describe("createAtobaraiRegisterTransactionPayload", () => {
         atobaraiShopOrderDate: "invalid-date",
       }),
     ).toThrowErrorMatchingInlineSnapshot(`
-      [ZodError: [
+      [AtobaraiRegisterTransactionPayloadValidationError: [
         {
           "validation": "regex",
           "code": "invalid_string",
@@ -92,11 +92,13 @@ describe("createAtobaraiRegisterTransactionPayload", () => {
             "shop_order_date"
           ]
         }
-      ]]
+      ]
+      ZodValidationError: Validation error: Date must be in YYYY-MM-DD format at "transactions[0].shop_order_date"
+      Invalid register transaction payload: Validation error: Date must be in YYYY-MM-DD format at "transactions[0].shop_order_date"]
     `);
   });
 
-  it("should throw ZodError when saleorTransactionToken is too long (more than 40 chars)", () => {
+  it("should throw validation error when saleorTransactionToken is too long (more than 40 chars)", () => {
     expect(() =>
       createAtobaraiRegisterTransactionPayload({
         // @ts-expect-error - testing invalid token
@@ -107,8 +109,9 @@ describe("createAtobaraiRegisterTransactionPayload", () => {
         atobaraiGoods: mockedAtobaraiGoods,
         atobaraiShopOrderDate: mockedAtobaraiShopOrderDate,
       }),
-    ).toThrowErrorMatchingInlineSnapshot(`
-      [ZodError: [
+    ).toThrowErrorMatchingInlineSnapshot(
+      `
+      [AtobaraiRegisterTransactionPayloadValidationError: [
         {
           "code": "too_big",
           "maximum": 40,
@@ -122,8 +125,11 @@ describe("createAtobaraiRegisterTransactionPayload", () => {
             "shop_transaction_id"
           ]
         }
-      ]]
-    `);
+      ]
+      ZodValidationError: Validation error: String must contain at most 40 character(s) at "transactions[0].shop_transaction_id"
+      Invalid register transaction payload: Validation error: String must contain at most 40 character(s) at "transactions[0].shop_transaction_id"]
+    `,
+    );
   });
 
   it("shouldn't be assignable without createAtobaraiRegisterTransactionPayload", () => {

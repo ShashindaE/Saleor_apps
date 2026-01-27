@@ -1,5 +1,6 @@
 import { ok, Result } from "neverthrow";
 
+import { InvalidEventValidationError } from "@/app/api/webhooks/saleor/use-case-errors";
 import { createLogger } from "@/lib/logger";
 import { createAtobaraiCancelTransactionPayload } from "@/modules/atobarai/api/atobarai-cancel-transaction-payload";
 import {
@@ -22,7 +23,6 @@ import {
   RefundSuccessResult,
 } from "@/modules/transaction-result/refund-result";
 
-import { MalformedRequestResponse } from "../../saleor-webhook-responses";
 import { TransactionRefundRequestedUseCaseResponse } from "../use-case-response";
 import { BeforeFulfillmentRefundContext, BeforeFulfillmentRefundStrategy } from "./types";
 
@@ -31,7 +31,12 @@ export class BeforeFulfillmentFullRefundStrategy implements BeforeFulfillmentRef
 
   async execute(
     context: BeforeFulfillmentRefundContext,
-  ): Promise<Result<TransactionRefundRequestedUseCaseResponse, MalformedRequestResponse>> {
+  ): Promise<
+    Result<
+      TransactionRefundRequestedUseCaseResponse,
+      InstanceType<typeof InvalidEventValidationError>
+    >
+  > {
     const { atobaraiTransactionId, apiClient } = context;
 
     const payload = createAtobaraiCancelTransactionPayload({
@@ -43,7 +48,7 @@ export class BeforeFulfillmentFullRefundStrategy implements BeforeFulfillmentRef
     });
 
     if (cancelResult.isErr()) {
-      this.logger.error("Failed to cancel Atobarai transaction", {
+      this.logger.warn("Failed to cancel Atobarai transaction", {
         error: cancelResult.error,
       });
 
@@ -73,7 +78,12 @@ export class BeforeFulfillmentPartialRefundWithLineItemsStrategy
 
   async execute(
     context: BeforeFulfillmentRefundContext,
-  ): Promise<Result<TransactionRefundRequestedUseCaseResponse, MalformedRequestResponse>> {
+  ): Promise<
+    Result<
+      TransactionRefundRequestedUseCaseResponse,
+      InstanceType<typeof InvalidEventValidationError>
+    >
+  > {
     const { parsedEvent, appConfig, atobaraiTransactionId, apiClient } = context;
 
     if (!parsedEvent.grantedRefund) {
@@ -124,7 +134,7 @@ export class BeforeFulfillmentPartialRefundWithLineItemsStrategy
     });
 
     if (changeTransactionResult.isErr()) {
-      this.logger.error("Failed to change Atobarai transaction", {
+      this.logger.warn("Failed to change Atobarai transaction", {
         error: changeTransactionResult.error,
       });
 
@@ -152,7 +162,12 @@ export class BeforeFulfillmentPartialRefundWithoutLineItemsStrategy
 
   async execute(
     context: BeforeFulfillmentRefundContext,
-  ): Promise<Result<TransactionRefundRequestedUseCaseResponse, MalformedRequestResponse>> {
+  ): Promise<
+    Result<
+      TransactionRefundRequestedUseCaseResponse,
+      InstanceType<typeof InvalidEventValidationError>
+    >
+  > {
     const { parsedEvent, appConfig, atobaraiTransactionId, apiClient } = context;
 
     const amountAfterRefund = parsedEvent.sourceObjectTotalAmount - parsedEvent.refundedAmount;
@@ -191,7 +206,7 @@ export class BeforeFulfillmentPartialRefundWithoutLineItemsStrategy
     });
 
     if (changeTransactionResult.isErr()) {
-      this.logger.error("Failed to change Atobarai transaction", {
+      this.logger.warn("Failed to change Atobarai transaction", {
         error: changeTransactionResult.error,
       });
 

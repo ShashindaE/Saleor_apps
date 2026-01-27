@@ -43,12 +43,12 @@ describe("createAtobaraiCustomer", () => {
 
     expect(customer).toMatchInlineSnapshot(`
       {
-        "address": "BillingCountryAreaBillingStreetAddress1BillingStreetAddress2",
+        "address": "BillingCountryArea千代田区千代田BillingStreetAddress1BillingStreetAddress2",
         "company_name": "BillingCompanyName",
         "customer_name": "BillingLastName BillingFirstName",
         "email": "source-object@email.com",
         "tel": "0billingPhone",
-        "zip_code": "BillingPostalCode",
+        "zip_code": "1000001",
       }
     `);
   });
@@ -60,12 +60,12 @@ describe("createAtobaraiCustomer", () => {
 
     expect(customer).toMatchInlineSnapshot(`
       {
-        "address": "BillingCountryAreaBillingStreetAddress1BillingStreetAddress2",
+        "address": "BillingCountryArea千代田区千代田BillingStreetAddress1BillingStreetAddress2",
         "company_name": "BillingCompanyName",
         "customer_name": "BillingLastName BillingFirstName",
         "email": "user-order-email@example.com",
         "tel": "0billingPhone",
-        "zip_code": "BillingPostalCode",
+        "zip_code": "1000001",
       }
     `);
   });
@@ -140,6 +140,32 @@ describe("createAtobaraiCustomer", () => {
 
     expect(() => createAtobaraiCustomer(eventWithEmptyPhone)).toThrowErrorMatchingInlineSnapshot(
       `[AtobaraiCustomerMissingDataError: Phone number is required to create AtobaraiCustomer]`,
+    );
+  });
+
+  it("should throw MissingDataError when email format is invalid", () => {
+    const eventWithInvalidEmail = {
+      sourceObject: {
+        ...mockedCheckoutSourceObject,
+        email: "invalid-email-format",
+      },
+    };
+
+    expect(() => createAtobaraiCustomer(eventWithInvalidEmail)).toThrowErrorMatchingInlineSnapshot(
+      `
+      [AtobaraiCustomerMissingDataError: [
+        {
+          "validation": "email",
+          "code": "invalid_string",
+          "message": "Invalid email",
+          "path": [
+            "email"
+          ]
+        }
+      ]
+      ZodValidationError: Validation error: Invalid email at "email"
+      Invalid customer data: Validation error: Invalid email at "email"]
+    `,
     );
   });
 

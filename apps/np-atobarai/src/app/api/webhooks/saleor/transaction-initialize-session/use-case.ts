@@ -1,6 +1,5 @@
 import { SaleorApiUrl } from "@saleor/apps-domain/saleor-api-url";
-import { BaseError } from "@saleor/errors";
-import { err, ok, Result } from "neverthrow";
+import { err, fromThrowable, ok, Result } from "neverthrow";
 
 import { TransactionInitializeSessionEventFragment } from "@/generated/graphql";
 import { createLogger } from "@/lib/logger";
@@ -8,6 +7,7 @@ import { AppChannelConfig } from "@/modules/app-config/app-config";
 import { AppConfigRepo } from "@/modules/app-config/repo/app-config-repo";
 import {
   AtobaraiRegisterTransactionPayload,
+  AtobaraiRegisterTransactionPayloadValidationError,
   createAtobaraiRegisterTransactionPayload,
 } from "@/modules/atobarai/api/atobarai-register-transaction-payload";
 import {
@@ -32,18 +32,14 @@ import { TransactionRecord } from "@/modules/transactions-recording/transaction-
 import { TransactionRecordRepo } from "@/modules/transactions-recording/types";
 
 import { BaseUseCase } from "../base-use-case";
-import {
-  AppIsNotConfiguredResponse,
-  BrokenAppResponse,
-  MalformedRequestResponse,
-} from "../saleor-webhook-responses";
-import { AtobaraiFailureTransactionError } from "../use-case-errors";
+import { AppIsNotConfiguredResponse, BrokenAppResponse } from "../saleor-webhook-responses";
+import { AtobaraiFailureTransactionError, InvalidEventValidationError } from "../use-case-errors";
 import { TransactionInitializeSessionUseCaseResponse } from "./use-case-response";
 
 type UseCaseExecuteResult = Promise<
   Result<
     TransactionInitializeSessionUseCaseResponse,
-    AppIsNotConfiguredResponse | MalformedRequestResponse | BrokenAppResponse
+    AppIsNotConfiguredResponse | BrokenAppResponse
   >
 >;
 
@@ -68,21 +64,36 @@ export class TransactionInitializeSessionUseCase extends BaseUseCase {
   private prepareRegisterTransactionPayload(
     event: TransactionInitializeSessionEventFragment,
     config: AppChannelConfig,
-  ): AtobaraiRegisterTransactionPayload {
-    return createAtobaraiRegisterTransactionPayload({
-      saleorTransactionToken: createSaleorTransactionToken(event.transaction.token),
-      atobaraiMoney: createAtobaraiMoney({
-        amount: event.action.amount,
-        currency: event.action.currency,
-      }),
-      atobaraiCustomer: createAtobaraiCustomer(event),
-      atobaraiDeliveryDestination: createAtobaraiDeliveryDestination(event),
-      atobaraiGoods: this.goodsBuilder.build({
-        sourceObject: event.sourceObject,
-        useSkuAsName: config.skuAsName,
-      }),
-      atobaraiShopOrderDate: createAtobaraiShopOrderDate(event.issuedAt!), // checked if exists in execute method
-    });
+  ): Result<
+    AtobaraiRegisterTransactionPayload,
+    InstanceType<typeof AtobaraiRegisterTransactionPayloadValidationError>
+  > {
+    try {
+      const atobaraiCustomer = createAtobaraiCustomer(event);
+      const atobaraiDeliveryDestination = createAtobaraiDeliveryDestination(event);
+
+      const transactionPayloadResult = fromThrowable(
+        createAtobaraiRegisterTransactionPayload,
+        AtobaraiRegisterTransactionPayloadValidationError.normalize,
+      )({
+        saleorTransactionToken: createSaleorTransactionToken(event.transaction.token),
+        atobaraiMoney: createAtobaraiMoney({
+          amount: event.action.amount,
+          currency: event.action.currency,
+        }),
+        atobaraiCustomer,
+        atobaraiDeliveryDestination,
+        atobaraiGoods: this.goodsBuilder.build({
+          sourceObject: event.sourceObject,
+          useSkuAsName: config.skuAsName,
+        }),
+        atobaraiShopOrderDate: createAtobaraiShopOrderDate(event.issuedAt!), // checked if exists in execute method
+      });
+
+      return transactionPayloadResult;
+    } catch (error) {
+      return err(AtobaraiRegisterTransactionPayloadValidationError.normalize(error));
+    }
   }
 
   private async mapAtobaraiResponseToUseCaseResponse({
@@ -141,9 +152,20 @@ export class TransactionInitializeSessionUseCase extends BaseUseCase {
       case CreditCheckResult.BeforeReview:
         return ok(
           new TransactionInitializeSessionUseCaseResponse.Failure({
+            apiError: transaction.authori_result,
             transactionResult: new ChargeFailureResult(),
             error: new AtobaraiFailureTransactionError(
               `Atobarai transaction failed with result: ${transaction.authori_result}`,
+            ),
+          }),
+        );
+      default:
+        return ok(
+          new TransactionInitializeSessionUseCaseResponse.Failure({
+            apiError: transaction.authori_result,
+            transactionResult: new ChargeFailureResult(),
+            error: new AtobaraiFailureTransactionError(
+              `Unexpected Atobarai transaction result: ${transaction.authori_result}`,
             ),
           }),
         );
@@ -172,7 +194,16 @@ export class TransactionInitializeSessionUseCase extends BaseUseCase {
         event,
       });
 
-      return err(new MalformedRequestResponse(new BaseError("Missing issuedAt in event")));
+      return ok(
+        new TransactionInitializeSessionUseCaseResponse.Failure({
+          error: new InvalidEventValidationError("Missing issuedAt in event", {
+            props: {
+              publicMessage: "Missing issuedAt in event",
+            },
+          }),
+          transactionResult: new ChargeFailureResult(),
+        }),
+      );
     }
 
     const apiClient = this.atobaraiApiClientFactory.create({
@@ -182,15 +213,36 @@ export class TransactionInitializeSessionUseCase extends BaseUseCase {
       atobaraiEnvironment: atobaraiConfigResult.value.useSandbox ? "sandbox" : "production",
     });
 
-    const registerTransactionResult = await apiClient.registerTransaction(
-      this.prepareRegisterTransactionPayload(event, atobaraiConfigResult.value),
-      {
-        rejectMultipleResults: true,
-      },
-    );
+    const payloadResult = this.prepareRegisterTransactionPayload(event, atobaraiConfigResult.value);
+
+    if (payloadResult.isErr()) {
+      this.logger.warn("Failed to prepare transaction payload", {
+        error: payloadResult.error,
+      });
+
+      return ok(
+        new TransactionInitializeSessionUseCaseResponse.Failure({
+          transactionResult: new ChargeFailureResult(),
+          error: new InvalidEventValidationError(payloadResult.error.message, {
+            cause: payloadResult.error,
+            props: {
+              publicMessage: payloadResult.error.message,
+            },
+          }),
+        }),
+      );
+    }
+
+    const registerTransactionResult = await apiClient.registerTransaction(payloadResult.value, {
+      rejectMultipleResults: true,
+    });
 
     if (registerTransactionResult.isErr()) {
-      this.logger.error("Failed to register transaction with Atobarai", {
+      /**
+       * We do not log error, because it's likely on of expected errors from the API
+       * TODO: Consider adding exact mapping of every available error - some of them can be actually errors, some of them not
+       */
+      this.logger.warn("Failed to register transaction with Atobarai", {
         error: registerTransactionResult.error,
       });
 
@@ -198,6 +250,10 @@ export class TransactionInitializeSessionUseCase extends BaseUseCase {
         new TransactionInitializeSessionUseCaseResponse.Failure({
           transactionResult: new ChargeFailureResult(),
           error: registerTransactionResult.error,
+          apiError:
+            "apiError" in registerTransactionResult.error
+              ? registerTransactionResult.error.apiError
+              : undefined,
         }),
       );
     }

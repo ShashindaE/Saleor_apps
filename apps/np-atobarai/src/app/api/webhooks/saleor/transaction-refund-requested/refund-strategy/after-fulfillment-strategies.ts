@@ -1,6 +1,7 @@
 import { BaseError } from "@saleor/errors";
 import { err, ok, Result } from "neverthrow";
 
+import { InvalidEventValidationError } from "@/app/api/webhooks/saleor/use-case-errors";
 import { createLogger } from "@/lib/logger";
 import { createAtobaraiCancelTransactionPayload } from "@/modules/atobarai/api/atobarai-cancel-transaction-payload";
 import { createAtobaraiFulfillmentReportPayload } from "@/modules/atobarai/api/atobarai-fulfillment-report-payload";
@@ -25,7 +26,6 @@ import {
   RefundSuccessResult,
 } from "@/modules/transaction-result/refund-result";
 
-import { MalformedRequestResponse } from "../../saleor-webhook-responses";
 import { TransactionRefundRequestedUseCaseResponse } from "../use-case-response";
 import { AfterFulfillmentRefundContext, AfterFulfillmentRefundStrategy } from "./types";
 
@@ -37,7 +37,12 @@ export class AfterFulfillmentFullRefundStrategy implements AfterFulfillmentRefun
 
   async execute(
     context: AfterFulfillmentRefundContext,
-  ): Promise<Result<TransactionRefundRequestedUseCaseResponse, MalformedRequestResponse>> {
+  ): Promise<
+    Result<
+      TransactionRefundRequestedUseCaseResponse,
+      InstanceType<typeof InvalidEventValidationError>
+    >
+  > {
     const { atobaraiTransactionId, apiClient } = context;
 
     const payload = createAtobaraiCancelTransactionPayload({
@@ -49,7 +54,7 @@ export class AfterFulfillmentFullRefundStrategy implements AfterFulfillmentRefun
     });
 
     if (cancelResult.isErr()) {
-      this.logger.error("Failed to cancel Atobarai transaction", {
+      this.logger.warn("Failed to cancel Atobarai transaction", {
         error: cancelResult.error,
       });
 
@@ -85,7 +90,12 @@ export class AfterFulfillmentPartialRefundWithLineItemsStrategy
 
   async execute(
     context: AfterFulfillmentRefundContext,
-  ): Promise<Result<TransactionRefundRequestedUseCaseResponse, MalformedRequestResponse>> {
+  ): Promise<
+    Result<
+      TransactionRefundRequestedUseCaseResponse,
+      InstanceType<typeof InvalidEventValidationError>
+    >
+  > {
     const {
       parsedEvent,
       appConfig,
@@ -115,7 +125,7 @@ export class AfterFulfillmentPartialRefundWithLineItemsStrategy
     );
 
     if (cancelTransactionResult.isErr()) {
-      this.logger.error("Failed to cancel Atobarai transaction", {
+      this.logger.warn("Failed to cancel Atobarai transaction", {
         error: cancelTransactionResult.error,
       });
 
@@ -151,7 +161,7 @@ export class AfterFulfillmentPartialRefundWithLineItemsStrategy
     const registerTransactionResult = await this.registerTransaction(payload, apiClient);
 
     if (registerTransactionResult.isErr()) {
-      this.logger.error("Failed to register Atobarai transaction", {
+      this.logger.warn("Failed to register Atobarai transaction", {
         error: registerTransactionResult.error,
       });
 
@@ -173,7 +183,7 @@ export class AfterFulfillmentPartialRefundWithLineItemsStrategy
     });
 
     if (fulfillmentResult.isErr()) {
-      this.logger.error("Failed to report Atobarai fulfillment", {
+      this.logger.warn("Failed to report Atobarai fulfillment", {
         error: fulfillmentResult.error,
       });
 
@@ -234,7 +244,12 @@ export class AfterFulfillmentPartialRefundWithoutLineItemsStrategy
 
   async execute(
     context: AfterFulfillmentRefundContext,
-  ): Promise<Result<TransactionRefundRequestedUseCaseResponse, MalformedRequestResponse>> {
+  ): Promise<
+    Result<
+      TransactionRefundRequestedUseCaseResponse,
+      InstanceType<typeof InvalidEventValidationError>
+    >
+  > {
     const {
       parsedEvent,
       appConfig,
@@ -252,7 +267,7 @@ export class AfterFulfillmentPartialRefundWithoutLineItemsStrategy
     );
 
     if (cancelTransactionResult.isErr()) {
-      this.logger.error("Failed to cancel Atobarai transaction", {
+      this.logger.warn("Failed to cancel Atobarai transaction", {
         error: cancelTransactionResult.error,
       });
 
@@ -290,7 +305,7 @@ export class AfterFulfillmentPartialRefundWithoutLineItemsStrategy
     const registerTransactionResult = await this.registerTransaction(payload, apiClient);
 
     if (registerTransactionResult.isErr()) {
-      this.logger.error("Failed to register Atobarai transaction", {
+      this.logger.warn("Failed to register Atobarai transaction", {
         error: registerTransactionResult.error,
       });
 
@@ -314,7 +329,7 @@ export class AfterFulfillmentPartialRefundWithoutLineItemsStrategy
     });
 
     if (fulfillmentResult.isErr()) {
-      this.logger.error("Failed to report Atobarai fulfillment", {
+      this.logger.warn("Failed to report Atobarai fulfillment", {
         error: fulfillmentResult.error,
       });
 

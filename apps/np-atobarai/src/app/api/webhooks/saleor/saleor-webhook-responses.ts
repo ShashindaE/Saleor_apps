@@ -50,16 +50,3 @@ export class UnhandledErrorResponse extends ErrorWebhookResponse {
     );
   }
 }
-
-export class MalformedRequestResponse extends ErrorWebhookResponse {
-  readonly message = "Malformed request";
-
-  getResponse() {
-    return Response.json(
-      {
-        message: this.message,
-      },
-      { status: this.statusCode },
-    );
-  }
-}

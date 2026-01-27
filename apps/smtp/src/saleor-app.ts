@@ -1,11 +1,13 @@
 import { APL } from "@saleor/app-sdk/APL";
 import { DynamoAPL } from "@saleor/app-sdk/APL/dynamodb";
 import { FileAPL } from "@saleor/app-sdk/APL/file";
-import { SaleorCloudAPL } from "@saleor/app-sdk/APL/saleor-cloud";
 import { UpstashAPL } from "@saleor/app-sdk/APL/upstash";
 import { SaleorApp } from "@saleor/app-sdk/saleor-app";
 
+import { createLogger } from "./logger";
 import { dynamoMainTable } from "./modules/dynamodb/dynamo-main-table";
+
+const logger = createLogger("saleor-app");
 
 const aplType = process.env.APL ?? "file";
 
@@ -31,6 +33,13 @@ switch (aplType) {
 
     apl = DynamoAPL.create({
       table: dynamoMainTable,
+      externalLogger: (message, level) => {
+        if (level === "error") {
+          logger.error(`[DynamoAPL] ${message}`);
+        } else {
+          logger.debug(`[DynamoAPL] ${message}`);
+        }
+      },
     });
 
     break;
@@ -45,19 +54,6 @@ switch (aplType) {
     apl = new FileAPL();
 
     break;
-
-  case "saleor-cloud": {
-    if (!process.env.REST_APL_ENDPOINT || !process.env.REST_APL_TOKEN) {
-      throw new Error("Rest APL is not configured - missing env variables. Check saleor-app.ts");
-    }
-
-    apl = new SaleorCloudAPL({
-      resourceUrl: process.env.REST_APL_ENDPOINT,
-      token: process.env.REST_APL_TOKEN,
-    });
-
-    break;
-  }
 
   default: {
     throw new Error("Invalid APL config, ");

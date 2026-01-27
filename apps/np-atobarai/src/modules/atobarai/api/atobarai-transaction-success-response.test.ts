@@ -163,39 +163,31 @@ describe("createAtobaraiTransactionSuccessResponse", () => {
     `);
   });
 
-  it("should throw ZodError when authori_result is invalid", () => {
+  it("should successfully parse any authori_result value", () => {
     const rawResponse = {
       results: [
         {
           np_transaction_id: mockedAtobaraiTransactionId,
-          authori_result: "99", // Invalid result code
+          authori_result: "99", // Any string is valid
         },
       ],
     };
 
-    expect(() => createAtobaraiTransactionSuccessResponse(rawResponse))
-      .toThrowErrorMatchingInlineSnapshot(`
-      [ZodError: [
-        {
-          "code": "invalid_union_discriminator",
-          "options": [
-            "00",
-            "10",
-            "20",
-            "40"
-          ],
-          "path": [
-            "results",
-            0,
-            "authori_result"
-          ],
-          "message": "Invalid discriminator value. Expected '00' | '10' | '20' | '40'"
-        }
-      ]]
+    const result = createAtobaraiTransactionSuccessResponse(rawResponse);
+
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "results": [
+          {
+            "authori_result": "99",
+            "np_transaction_id": "np_trans_id",
+          },
+        ],
+      }
     `);
   });
 
-  it("should throw ZodError when np_transaction_id is missing", () => {
+  it("should throw AtobaraiTransactionSuccessResponseValidationError when np_transaction_id is missing", () => {
     const rawResponse = {
       results: [
         {
@@ -205,9 +197,11 @@ describe("createAtobaraiTransactionSuccessResponse", () => {
       ],
     };
 
-    expect(() => createAtobaraiTransactionSuccessResponse(rawResponse))
-      .toThrowErrorMatchingInlineSnapshot(`
-      [ZodError: [
+    expect(() =>
+      createAtobaraiTransactionSuccessResponse(rawResponse),
+    ).toThrowErrorMatchingInlineSnapshot(
+      `
+      [AtobaraiTransactionSuccessResponseValidationError: [
         {
           "code": "invalid_type",
           "expected": "string",
@@ -219,8 +213,11 @@ describe("createAtobaraiTransactionSuccessResponse", () => {
           ],
           "message": "Required"
         }
-      ]]
-    `);
+      ]
+      ZodValidationError: Validation error: Required at "results[0].np_transaction_id"
+      Invalid Atobarai transaction success response format: Validation error: Required at "results[0].np_transaction_id"]
+    `,
+    );
   });
 
   it("shouldn't be assignable without createAtobaraiRegisterTransactionSuccessResponse", () => {

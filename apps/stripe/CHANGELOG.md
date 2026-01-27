@@ -1,5 +1,85 @@
 # saleor-app-payment-stripe
 
+## 2.3.12
+
+### Patch Changes
+
+- 560c3de4: Added logging to DynamoDB APL for better debugging and error visibility.
+
+## 2.3.11
+
+### Patch Changes
+
+- ea7fad59: Changed errors that were printed due to API rejection to be warnings, because they are usually bad payload from storefront
+- 2a4f27ad: Fixed how AWS sdk is initialized by explicitly passing credentials. This is caused by Vercel issue, which started to implicitly override some of our credentials by injecting their own.
+
+## 2.3.10
+
+### Patch Changes
+
+- be1fcf20: Fixed race condition in transaction recording that caused `ConditionalCheckFailedException` errors.
+  Previously, when two concurrent requests with the same idempotency key arrived (e.g., user clicking pay button multiple times),
+  the second request would fail with a DynamoDB error.
+  Now, duplicate write attempts are treated as idempotent success since Stripe already ensures the payment intent is not charged multiple times.
+
+## 2.3.9
+
+### Patch Changes
+
+- 9e17703c: Updated tTRPC to 10.45.3
+
+## 2.3.8
+
+### Patch Changes
+
+- Updated dependencies [37b91c88]
+  - @saleor/apps-otel@2.4.0
+  - @saleor/apps-logger@1.6.3
+
+## 2.3.7
+
+### Patch Changes
+
+- 98459d79: Updated Next.js to 15.2.6
+- b1f10da0: Added logs when app fails to install due to error in APL, or due to disallowed domain and when app installs successfully
+- Updated dependencies [98459d79]
+  - @saleor/apps-logger@1.6.2
+  - @saleor/apps-otel@2.3.1
+  - @saleor/react-hook-form-macaw@0.2.16
+  - @saleor/apps-shared@1.14.1
+  - @saleor/apps-trpc@4.0.4
+  - @saleor/apps-ui@1.3.2
+
+## 2.3.6
+
+### Patch Changes
+
+- 2f3ca93e: Changed legacy-webhook management logic to use "warn" instead of "error" for logs.
+
+## 2.3.5
+
+### Patch Changes
+
+- 27a4d622: Attach errors to trpc handlers for better debugging
+
+## 2.3.4
+
+### Patch Changes
+
+- f53f6e23: Added logs when app installation fails.
+
+## 2.3.3
+
+### Patch Changes
+
+- f531475b: Added additional logging to UpdateMapping handler. Previously no logs were issues when error occured which prevented proper debugging.
+
+## 2.3.2
+
+### Patch Changes
+
+- baf821a9: Fix logger message when canceling payment intent.
+
 ## 2.3.1
 
 ### Patch Changes

@@ -1,4 +1,7 @@
+import { BaseError } from "@saleor/errors";
 import { z } from "zod";
+
+import { zodReadableError } from "@/lib/zod-readable-error";
 
 import { AtobaraiTransactionIdSchema } from "../atobarai-transaction-id";
 
@@ -28,47 +31,41 @@ export const FailedReason = {
 const schema = z
   .object({
     results: z.array(
-      z.discriminatedUnion("authori_result", [
-        z.object({
-          np_transaction_id: AtobaraiTransactionIdSchema,
-          authori_result: z.literal(CreditCheckResult.Success),
-        }),
-        z.object({
-          np_transaction_id: AtobaraiTransactionIdSchema,
-          authori_result: z.literal(CreditCheckResult.Pending),
-          authori_hold: z.array(
-            z.enum([
-              PendingReason.LackOfAddressInformation,
-              PendingReason.AddressConfirmationOfWork,
-              PendingReason.InsufficientDeliveryDestinationInformation,
-              PendingReason.AddressConfirmationOfWorkDeliveryDestination,
-              PendingReason.PhoneNumberError,
-              PendingReason.PhoneNumberErrorAtDeliveryDestination,
-              PendingReason.Other,
-            ]),
-          ),
-        }),
-        z.object({
-          np_transaction_id: AtobaraiTransactionIdSchema,
-          authori_result: z.literal(CreditCheckResult.Failed),
-          authori_ng: z.enum([
-            FailedReason.ExcessOfTheAmount,
-            FailedReason.InsufficientInformation,
-            FailedReason.Other,
-          ]),
-        }),
-        z.object({
-          np_transaction_id: AtobaraiTransactionIdSchema,
-          authori_result: z.literal(CreditCheckResult.BeforeReview),
-        }),
-      ]),
+      z.object({
+        np_transaction_id: AtobaraiTransactionIdSchema,
+        authori_result: z.string(),
+        authori_hold: z.array(z.string()).optional(),
+        authori_ng: z.string().optional(),
+      }),
     ),
   })
   .brand("AtobaraiTransactionSuccessResponse");
 
+export const AtobaraiTransactionSuccessResponseValidationError = BaseError.subclass(
+  "AtobaraiTransactionSuccessResponseValidationError",
+  {
+    props: {
+      _brand: "AtobaraiTransactionSuccessResponseValidationError" as const,
+    },
+  },
+);
+
 export const createAtobaraiTransactionSuccessResponse = (
   rawResponse: unknown | AtobaraiTransactionSuccessResponse,
-) => schema.parse(rawResponse);
+) => {
+  const parseResult = schema.safeParse(rawResponse);
+
+  if (!parseResult.success) {
+    const readableError = zodReadableError(parseResult.error);
+
+    throw new AtobaraiTransactionSuccessResponseValidationError(
+      `Invalid Atobarai transaction success response format: ${readableError.message}`,
+      { cause: readableError },
+    );
+  }
+
+  return parseResult.data;
+};
 
 /**
  * Success response used for registering and updating transactions in Atobarai.
