@@ -52,7 +52,7 @@ export class SendEventMessagesUseCase {
       emailCompiler: IEmailCompiler;
       emailSender: ISMTPEmailSender;
     },
-  ) {}
+  ) { }
 
   private processSingleConfiguration({
     config,
@@ -201,56 +201,45 @@ export class SendEventMessagesUseCase {
       availableInChannel: channelSlug,
     });
 
-    if (availableSmtpConfigurations.isErr()) {
-      this.logger.warn("Failed to fetch configuration");
-
-      return err([
-        new SendEventMessagesUseCase.FailedToFetchConfigurationError(
-          "Failed to fetch configuration",
-          {
-            errors: [availableSmtpConfigurations.error],
-            props: {
-              channelSlug,
-              event,
-            },
-          },
         ),
       ]);
-    }
+  }
 
-    if (availableSmtpConfigurations.value.length === 0) {
-      this.logger.warn("Configuration list is empty, app is not configured");
+  if(availableSmtpConfigurations.value.length === 0) {
+  this.logger.warn("Configuration list is empty, app is not configured");
+  // eslint-disable-next-line no-console
+  console.error("--- EMAIL FAIL REASON: No Active Configuration Found for Channel ---", channelSlug);
 
-      return err([
-        new SendEventMessagesUseCase.MissingAvailableConfigurationError(
-          "Missing configuration for this channel that is active",
-          {
-            errors: [],
-            props: {
-              channelSlug,
-              event,
-            },
-          },
-        ),
-      ]);
-    }
-
-    this.logger.info(
-      `Detected valid configuration (${availableSmtpConfigurations.value.length}). Will process to send emails`,
-    );
-
-    const processingResults = await Promise.all(
-      availableSmtpConfigurations.value.map((config) =>
-        this.processSingleConfiguration({
-          config,
-          event,
-          payload,
-          recipientEmail,
+  return err([
+    new SendEventMessagesUseCase.MissingAvailableConfigurationError(
+      "Missing configuration for this channel that is active",
+      {
+        errors: [],
+        props: {
           channelSlug,
-        }),
-      ),
-    );
+          event,
+        },
+      },
+    ),
+  ]);
+}
 
-    return Result.combineWithAllErrors(processingResults);
+this.logger.info(
+  `Detected valid configuration (${availableSmtpConfigurations.value.length}). Will process to send emails`,
+);
+
+const processingResults = await Promise.all(
+  availableSmtpConfigurations.value.map((config) =>
+    this.processSingleConfiguration({
+      config,
+      event,
+      payload,
+      recipientEmail,
+      channelSlug,
+    }),
+  ),
+);
+
+return Result.combineWithAllErrors(processingResults);
   }
 }
