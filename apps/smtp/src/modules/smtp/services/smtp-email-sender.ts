@@ -32,7 +32,7 @@ export interface ISMTPEmailSender {
  * TODO: Implement errors mapping and neverthrow
  */
 export class SmtpEmailSender implements ISMTPEmailSender {
-  private TIMEOUT = 4000;
+  private TIMEOUT = 10000;
 
   private logger = createLogger("SmtpEmailSender");
 
@@ -42,7 +42,12 @@ export class SmtpEmailSender implements ISMTPEmailSender {
   );
 
   async sendEmailWithSmtp({ smtpSettings, mailData }: SendMailArgs) {
-    this.logger.debug("Sending an email with SMTP");
+    this.logger.debug("Sending an email with SMTP", {
+      host: smtpSettings.host,
+      port: smtpSettings.port,
+      encryption: smtpSettings.encryption,
+      user: smtpSettings.auth?.user,
+    });
 
     let transporter: nodemailer.Transporter;
 
