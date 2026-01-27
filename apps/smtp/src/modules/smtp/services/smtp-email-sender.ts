@@ -49,6 +49,50 @@ export class SmtpEmailSender implements ISMTPEmailSender {
       user: smtpSettings.auth?.user,
     });
 
+    /**
+     * Railway blocks all outgoing SMTP ports (25, 465, 587) on lower tier plans.
+     * If the user is using Resend, we can bypass this by using their HTTP API (port 443).
+     * Resend SMTP credentials (resend/re_...) are actually the same as the HTTP API Key.
+     */
+    if (smtpSettings.host === "smtp.resend.com") {
+      this.logger.info("Detected Resend SMTP. Using HTTP API bridge to bypass Railway port block.");
+
+      const apiKey = smtpSettings.auth?.pass;
+
+      if (!apiKey) {
+        throw new SmtpEmailSender.SmtpEmailSenderError("Missing Resend API Key (SMTP Password)");
+      }
+
+      const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          from: mailData.from,
+          to: [mailData.to],
+          subject: mailData.subject,
+          html: mailData.html,
+          text: mailData.text,
+        }),
+      });
+
+      const responseData = await res.json();
+
+      if (!res.ok) {
+        this.logger.error("Resend HTTP API failed", { responseData });
+
+        throw new SmtpEmailSender.SmtpEmailSenderError(
+          `Resend HTTP API error: ${res.status} ${JSON.stringify(responseData)}`,
+        );
+      }
+
+      this.logger.info("Email sent via Resend HTTP Bridge successfully", { id: responseData.id });
+
+      return { response: responseData };
+    }
+
     let transporter: nodemailer.Transporter;
 
     /*
