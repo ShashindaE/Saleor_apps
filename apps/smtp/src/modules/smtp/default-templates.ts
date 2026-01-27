@@ -116,7 +116,7 @@ const orderLinesSection = `<mj-section>
 
 const defaultOrderCreatedMjmlTemplate = `<mjml>
   <mj-body>
-    \${brandLogoSection}
+    ${brandLogoSection}
     <mj-section>
       <mj-column>
         <mj-text font-size="16px">
@@ -134,7 +134,7 @@ const defaultOrderCreatedMjmlTemplate = `<mjml>
 
 const defaultOrderFulfilledMjmlTemplate = `<mjml>
   <mj-body>
-    \${brandLogoSection}
+    ${brandLogoSection}
     <mj-section>
       <mj-column>
         <mj-text font-size="16px">
@@ -152,7 +152,7 @@ const defaultOrderFulfilledMjmlTemplate = `<mjml>
 
 const defaultOrderConfirmedMjmlTemplate = `<mjml>
   <mj-body>
-    \${brandLogoSection}
+    ${brandLogoSection}
     <mj-section>
       <mj-column>
         <mj-text font-size="16px">
@@ -170,7 +170,7 @@ const defaultOrderConfirmedMjmlTemplate = `<mjml>
 
 const defaultOrderFullyPaidMjmlTemplate = `<mjml>
   <mj-body>
-    \${brandLogoSection}
+    ${brandLogoSection}
     <mj-section>
       <mj-column>
         <mj-text font-size="16px">
@@ -188,7 +188,7 @@ const defaultOrderFullyPaidMjmlTemplate = `<mjml>
 
 const defaultOrderRefundedMjmlTemplate = `<mjml>
   <mj-body>
-    \${brandLogoSection}
+    ${brandLogoSection}
     <mj-section>
       <mj-column>
         <mj-text font-size="16px">
@@ -206,7 +206,7 @@ const defaultOrderRefundedMjmlTemplate = `<mjml>
 
 const defaultOrderCancelledMjmlTemplate = `<mjml>
   <mj-body>
-    \${brandLogoSection}
+    ${brandLogoSection}
     <mj-section>
       <mj-column>
         <mj-text font-size="16px">
