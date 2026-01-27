@@ -24,6 +24,7 @@ export default wrapWithLoggerContext(
       allowedSaleorUrls: [
         (url) => {
           console.log("--- NUCLEAR DEBUG: CHECKING URL (Accepted) ---", url);
+
           return true;
         }
       ],
