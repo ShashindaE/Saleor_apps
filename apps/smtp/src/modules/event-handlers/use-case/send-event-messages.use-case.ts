@@ -107,6 +107,8 @@ export class SendEventMessagesUseCase {
           props: {
             senderName: config.senderName,
             senderEmail: config.senderEmail,
+            configId: config.id,
+            allKeys: Object.keys(config),
           },
         }),
       );
