@@ -8,6 +8,7 @@ import { createLogger } from "../../logger";
 import { loggerContext } from "../../logger-context";
 import { fetchSaleorVersion } from "../../modules/feature-flag-service/fetch-saleor-version";
 import { REQUIRED_SALEOR_VERSION, saleorApp } from "../../saleor-app";
+import { NextApiRequest, NextApiResponse } from "next";
 
 const allowedUrlsPattern = process.env.ALLOWED_DOMAIN_PATTERN;
 
@@ -17,7 +18,7 @@ const logger = createLogger("createAppRegisterHandler");
  * Required endpoint, called by Saleor to install app.
  * It will exchange tokens with app, so saleorApp.apl will contain token
  */
-export default wrapWithLoggerContext(
+const sdkHandler = wrapWithLoggerContext(
   withSpanAttributes(
     createAppRegisterHandler({
       apl: saleorApp.apl,
@@ -70,3 +71,13 @@ export default wrapWithLoggerContext(
   ),
   loggerContext,
 );
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  /* eslint-disable no-console */
+  console.log("--- RAW REQUEST WRAPPER HIT ---");
+  console.log("Method:", req.method);
+  console.log("Headers:", JSON.stringify(req.headers, null, 2));
+
+  // Forward to SDK handler
+  return sdkHandler(req, res);
+}
