@@ -78,31 +78,7 @@ export default wrapWithLoggerContext(
           });
         }
 
-        if (!saleorVersion) {
-          console.error("--- NUCLEAR DEBUG: NO VERSION ---");
-          // logger.warn({ saleorApiUrl }, "No version returned from Saleor API");
-          // throw respondWithError({
-          //   message: "Saleor version couldn't be fetched from the API",
-          //   status: 400,
-          // });
-        }
-
         // BYPASS VERSION VALIDATION FOR DEBUGGING
-        // const isVersionValid = new SaleorVersionCompatibilityValidator(
-        //   REQUIRED_SALEOR_VERSION,
-        // ).isValid(saleorVersion);
-
-        // if (!isVersionValid) {
-        //   logger.info(
-        //     { saleorApiUrl },
-        //     "Rejecting installation due to incompatible Saleor version",
-        //   );
-        //   throw respondWithError({
-        //     message: `Saleor version (${saleorVersion}) is not compatible with this app version (${REQUIRED_SALEOR_VERSION})`,
-        //     status: 400,
-        //   });
-        // }
-
         logger.info("Saleor version validated successfully (BYPASSED)");
       },
     }),
