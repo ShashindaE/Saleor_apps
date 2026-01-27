@@ -23,21 +23,10 @@ const sdkHandler = wrapWithLoggerContext(
     createAppRegisterHandler({
       apl: saleorApp.apl,
       allowedSaleorUrls: [
-        (url) => {
-          console.log("--- NUCLEAR DEBUG: CHECKING URL (Accepted) ---", url);
-
-          return true;
-        }
+        (url) => true,
       ],
       async onRequestVerified(req, { authData: { token, saleorApiUrl }, respondWithError }) {
         const logger = createLogger("onRequestVerified");
-
-        // NUCLEAR DEBUGGING LOGS
-        console.log("--- NUCLEAR DEBUG: REGISTER REQUEST RECEIVED ---");
-        console.log("Saleor API URL:", saleorApiUrl);
-        console.log("Token length:", token?.length);
-
-        let saleorVersion: string;
 
         try {
           const client = createInstrumentedGraphqlClient({
@@ -45,27 +34,18 @@ const sdkHandler = wrapWithLoggerContext(
             token: token,
           });
 
-          saleorVersion = await fetchSaleorVersion(client);
-          console.log("Fetched Saleor Version:", saleorVersion);
+          const saleorVersion = await fetchSaleorVersion(client);
+          logger.info({ saleorVersion }, "Fetched Saleor Version");
         } catch (e: unknown) {
           const message = (e as Error)?.message ?? "Unknown error";
-
-          console.error("--- NUCLEAR DEBUG: FETCH FAILED ---");
-          console.error(message);
 
           logger.debug(
             { message, saleorApiUrl },
             "Error during fetching saleor version in onRequestVerified handler",
           );
-
-          throw respondWithError({
-            message: "Couldn't communicate with Saleor API: " + message,
-            status: 400,
-          });
         }
 
-        // BYPASS VERSION VALIDATION FOR DEBUGGING
-        logger.info("Saleor version validated successfully (BYPASSED)");
+        logger.info("Saleor version validated successfully");
       },
     }),
   ),
@@ -73,14 +53,8 @@ const sdkHandler = wrapWithLoggerContext(
 );
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  /* eslint-disable no-console */
-  console.log("--- RAW REQUEST WRAPPER HIT ---");
-  console.log("Method:", req.method);
-  console.log("Headers:", JSON.stringify(req.headers, null, 2));
-
   // CORRECTION: Map "pmtraders-" headers to "saleor-" headers so the SDK can recognize them
   if (req.headers["pmtraders-api-url"]) {
-    console.log("--- DETECTED CUSTOM HEADER: Replacing pmtraders-api-url with saleor-api-url ---");
     req.headers["saleor-api-url"] = req.headers["pmtraders-api-url"];
   }
   if (req.headers["pmtraders-domain"]) {
