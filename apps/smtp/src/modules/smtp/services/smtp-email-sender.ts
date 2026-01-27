@@ -54,7 +54,9 @@ export class SmtpEmailSender implements ISMTPEmailSender {
      * If the user is using Resend, we can bypass this by using their HTTP API (port 443).
      * Resend SMTP credentials (resend/re_...) are actually the same as the HTTP API Key.
      */
-    if (smtpSettings.host === "smtp.resend.com") {
+    const forceSmtp = process.env.FORCE_SMTP === "true";
+
+    if (smtpSettings.host === "smtp.resend.com" && !forceSmtp) {
       this.logger.info("Detected Resend SMTP. Using HTTP API bridge to bypass Railway port block.");
 
       const apiKey = smtpSettings.auth?.pass;
