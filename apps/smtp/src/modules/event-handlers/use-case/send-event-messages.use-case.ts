@@ -269,10 +269,13 @@ export class SendEventMessagesUseCase {
 
           const quantity = line.quantity ?? 0;
           let formattedQuantity = quantity.toString();
+
           if (isWeighted) {
             const grams = quantity * 25;
+
             if (grams >= 1000) {
               const kg = grams / 1000;
+
               formattedQuantity = kg % 1 === 0 ? `${kg}kg` : `${kg.toFixed(1)}kg`;
             } else {
               formattedQuantity = `${grams}g`;
