@@ -7,12 +7,9 @@ import { getBaseUrl } from "../../lib/get-base-url";
 export const createTrpcContext = async ({ res, req }: trpcNext.CreateNextContextOptions) => {
   const baseUrl = getBaseUrl(req.headers);
 
-  // CORRECTION: Map "pmtraders-" headers to "saleor-" headers so TRPC can authenticate
-  const saleorApiUrl = (req.headers[SALEOR_API_URL_HEADER] || req.headers["pmtraders-api-url"]) as string | undefined;
-
   return {
     token: req.headers[SALEOR_AUTHORIZATION_BEARER_HEADER] as string | undefined,
-    saleorApiUrl: saleorApiUrl,
+    saleorApiUrl: req.headers[SALEOR_API_URL_HEADER] as string | undefined,
     appId: undefined as undefined | string,
     ssr: undefined as undefined | boolean,
     baseUrl,

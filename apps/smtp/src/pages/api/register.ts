@@ -53,14 +53,6 @@ const sdkHandler = wrapWithLoggerContext(
 );
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // CORRECTION: Map "pmtraders-" headers to "saleor-" headers so the SDK can recognize them
-  if (req.headers["pmtraders-api-url"]) {
-    req.headers["saleor-api-url"] = req.headers["pmtraders-api-url"];
-  }
-  if (req.headers["pmtraders-domain"]) {
-    req.headers["saleor-domain"] = req.headers["pmtraders-domain"];
-  }
-
   // Forward to SDK handler
   return sdkHandler(req, res);
 }
