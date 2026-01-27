@@ -104,7 +104,7 @@ const handler: NextJsWebhookHandler<OrderCreatedWebhookPayloadFragment> = async 
               // eslint-disable-next-line no-console
               console.error("--- EMAIL FAIL REASON (ClientError) ---", JSON.stringify(err, null, 2));
 
-              return res.status(400).json({ message: "Failed to send email" });
+              return res.status(400).json({ message: "Failed to send email", details: err });
             } else if (errorInstance instanceof SendEventMessagesUseCase.NoOpError) {
               logger.info("Sending emails aborted [no op]", { error: err });
 
