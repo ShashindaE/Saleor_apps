@@ -284,6 +284,7 @@ export class SendEventMessagesUseCase {
 
           return {
             ...line,
+            quantity: isWeighted ? formattedQuantity : quantity,
             formattedQuantity,
           };
         });

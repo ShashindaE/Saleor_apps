@@ -1,5 +1,13 @@
 import { MessageEventTypes } from "../event-handlers/message-event-types";
 
+const brandLogoSection = `<mj-section padding-bottom="0px">
+  <mj-column>
+    {{#if logoUrl}}
+      <mj-image src="{{logoUrl}}" alt="PMTraders Logo" width="150px" align="left" />
+    {{/if}}
+  </mj-column>
+</mj-section>`;
+
 const addressSection = `<mj-section>
   <mj-column>
     <mj-table>
@@ -108,6 +116,7 @@ const orderLinesSection = `<mj-section>
 
 const defaultOrderCreatedMjmlTemplate = `<mjml>
   <mj-body>
+    \${brandLogoSection}
     <mj-section>
       <mj-column>
         <mj-text font-size="16px">
@@ -125,6 +134,7 @@ const defaultOrderCreatedMjmlTemplate = `<mjml>
 
 const defaultOrderFulfilledMjmlTemplate = `<mjml>
   <mj-body>
+    \${brandLogoSection}
     <mj-section>
       <mj-column>
         <mj-text font-size="16px">
@@ -142,6 +152,7 @@ const defaultOrderFulfilledMjmlTemplate = `<mjml>
 
 const defaultOrderConfirmedMjmlTemplate = `<mjml>
   <mj-body>
+    \${brandLogoSection}
     <mj-section>
       <mj-column>
         <mj-text font-size="16px">
@@ -159,6 +170,7 @@ const defaultOrderConfirmedMjmlTemplate = `<mjml>
 
 const defaultOrderFullyPaidMjmlTemplate = `<mjml>
   <mj-body>
+    \${brandLogoSection}
     <mj-section>
       <mj-column>
         <mj-text font-size="16px">
@@ -176,6 +188,7 @@ const defaultOrderFullyPaidMjmlTemplate = `<mjml>
 
 const defaultOrderRefundedMjmlTemplate = `<mjml>
   <mj-body>
+    \${brandLogoSection}
     <mj-section>
       <mj-column>
         <mj-text font-size="16px">
@@ -193,6 +206,7 @@ const defaultOrderRefundedMjmlTemplate = `<mjml>
 
 const defaultOrderCancelledMjmlTemplate = `<mjml>
   <mj-body>
+    \${brandLogoSection}
     <mj-section>
       <mj-column>
         <mj-text font-size="16px">
