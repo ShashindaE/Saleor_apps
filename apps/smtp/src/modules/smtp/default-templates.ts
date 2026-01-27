@@ -1,172 +1,152 @@
 import { MessageEventTypes } from "../event-handlers/message-event-types";
 
-const brandLogoSection = `<mj-section padding-bottom="0px">
+const brandLogoSection = `<mj-section padding-bottom="24px" css-class="header-section">
   <mj-column>
     {{#if logoUrl}}
-      <mj-image src="{{logoUrl}}" alt="PMTraders Logo" width="150px" align="left" />
+      <mj-image src="{{logoUrl}}" alt="PMTraders" width="120px" align="center" />
     {{/if}}
   </mj-column>
 </mj-section>`;
 
-const addressSection = `<mj-section>
+const premiumFooterSection = `<mj-section padding-top="40px" padding-bottom="24px">
   <mj-column>
-    <mj-table>
-      <thead>
-        <tr>
-          <th>
-            Billing address
-          </th>
-          <th>
-            Shipping address
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>
-            {{#if order.billingAddress}}
-              {{ order.billingAddress.streetAddress1 }}
-            {{else}}
-              No billing address
-            {{/if}}
-          </td>
-          <td>
-            {{#if order.shippingAddress}}
-              {{ order.shippingAddress.streetAddress1}}
-            {{else}}
-              No shipping required
-            {{/if}}
-          </td>
-        </tr>
-      </tbody>
-    </mj-table>
+    <mj-text align="center" font-size="12px" color="#666666">
+      © 2024 PMTraders. All rights reserved.
+    </mj-text>
+    <mj-text align="center" font-size="12px" color="#666666">
+      Questions? Reply to this email.
+    </mj-text>
   </mj-column>
-</mj-section>
-`;
+</mj-section>`;
 
-const addressSectionForNotify = `<mj-section>
-  <mj-column>
-    <mj-table>
-      <thead>
-        <tr>
-          <th>
-            Billing address
-          </th>
-          <th>
-            Shipping address
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>
-            {{#if order.billing_address}}
-              {{ order.billing_address.street_address_1 }}
-            {{else}}
-              No billing address
-            {{/if}}
-          </td>
-          <td>
-            {{#if order.shipping_address}}
-              {{ order.shipping_address.street_address_1}}
-            {{else}}
-              No shipping required
-            {{/if}}
-          </td>
-        </tr>
-      </tbody>
-    </mj-table>
+const addressSection = `<mj-section padding="0px 24px 24px 24px">
+  <mj-column width="48%">
+    <mj-text font-weight="bold" font-size="14px" color="#18181b" padding-bottom="8px">Billing Address</mj-text>
+    <mj-text font-size="14px" color="#52525b" line-height="1.5">
+      {{#if order.billingAddress}}
+        {{ order.billingAddress.streetAddress1 }}<br/>
+        {{ order.billingAddress.city }} {{ order.billingAddress.postalCode }}
+      {{else}}
+        No billing address
+      {{/if}}
+    </mj-text>
   </mj-column>
-</mj-section>
-`;
+  <mj-column width="4%">
+  </mj-column>
+  <mj-column width="48%">
+    <mj-text font-weight="bold" font-size="14px" color="#18181b" padding-bottom="8px">Shipping Address</mj-text>
+    <mj-text font-size="14px" color="#52525b" line-height="1.5">
+      {{#if order.shippingAddress}}
+        {{ order.shippingAddress.streetAddress1}}<br/>
+        {{ order.shippingAddress.city }} {{ order.shippingAddress.postalCode }}
+      {{else}}
+        No shipping required
+      {{/if}}
+    </mj-text>
+  </mj-column>
+</mj-section>`;
 
-const orderLinesSection = `<mj-section>
+const addressSectionForNotify = `<mj-section padding="0px 24px 24px 24px">
+  <mj-column width="48%">
+    <mj-text font-weight="bold" font-size="14px" color="#18181b" padding-bottom="8px">Billing Address</mj-text>
+    <mj-text font-size="14px" color="#52525b" line-height="1.5">
+      {{#if order.billing_address}}
+        {{ order.billing_address.street_address_1 }}<br/>
+        {{ order.billing_address.city }} {{ order.billing_address.postal_code }}
+      {{else}}
+        No billing address
+      {{/if}}
+    </mj-text>
+  </mj-column>
+  <mj-column width="4%">
+  </mj-column>
+  <mj-column width="48%">
+    <mj-text font-weight="bold" font-size="14px" color="#18181b" padding-bottom="8px">Shipping Address</mj-text>
+    <mj-text font-size="14px" color="#52525b" line-height="1.5">
+      {{#if order.shipping_address}}
+        {{ order.shipping_address.street_address_1}}<br/>
+        {{ order.shipping_address.city }} {{ order.shipping_address.postal_code }}
+      {{else}}
+        No shipping required
+      {{/if}}
+    </mj-text>
+  </mj-column>
+</mj-section>`;
+
+const orderLinesSection = `<mj-section padding="0px 24px">
   <mj-column>
-    <mj-table>
-      <tbody>
-        {{#each order.lines }}
-          <tr>
-            <td>
-              {{ this.quantity }} x {{ this.productName }} - {{ this.variantName }}
-            </td>
-            <td align="right">
-              {{ this.totalPrice.gross.amount }} {{ this.totalPrice.gross.currency }}
-            </td>
-          </tr>
-        {{/each}}
-        <tr>
-          <td>
+    <mj-table padding="0">
+      <tr style="border-bottom:1px solid #e4e4e7; text-align:left;">
+        <th style="padding: 12px 0; font-weight: 600; color: #71717a; font-size: 12px; text-transform: uppercase;">Item</th>
+        <th style="padding: 12px 0; font-weight: 600; color: #71717a; font-size: 12px; text-transform: uppercase; text-align: right;">Qty/Wt</th>
+        <th style="padding: 12px 0; font-weight: 600; color: #71717a; font-size: 12px; text-transform: uppercase; text-align: right;">Price</th>
+      </tr>
+      {{#each order.lines }}
+        <tr style="border-bottom:1px solid #f4f4f5;">
+          <td style="padding: 12px 0; color: #18181b; font-size: 14px; font-weight: 500;">
+            {{ this.productName }} <span style="color: #71717a; font-weight: 400;">- {{ this.variantName }}</span>
           </td>
-          <td align="right">
-            Shipping: {{ order.shippingPrice.gross.amount }} {{ order.shippingPrice.gross.currency }}
+          <td style="padding: 12px 0; color: #18181b; font-size: 14px; text-align: right;">
+            {{ this.quantity }}
           </td>
-        </tr>
-        <tr>
-          <td>
-          </td>
-          <td align="right">
-            Total: {{ order.total.gross.amount }} {{ order.total.gross.currency }}
+          <td style="padding: 12px 0; color: #18181b; font-size: 14px; text-align: right;">
+             {{ this.totalPrice.gross.amount }} {{ this.totalPrice.gross.currency }}
           </td>
         </tr>
-      </tbody>
+      {{/each}}
+      <tr>
+        <td colspan="2" style="padding: 16px 0 8px 0; text-align: right; color: #71717a; font-size: 14px;">Shipping</td>
+        <td style="padding: 16px 0 8px 0; text-align: right; color: #18181b; font-size: 14px;">
+          {{ order.shippingPrice.gross.amount }} {{ order.shippingPrice.gross.currency }}
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" style="padding: 8px 0; text-align: right; font-weight: 700; color: #18181b; font-size: 16px;">Total</td>
+        <td style="padding: 8px 0; text-align: right; font-weight: 700; color: #18181b; font-size: 16px;">
+          {{ order.total.gross.amount }} {{ order.total.gross.currency }}
+        </td>
+      </tr>
     </mj-table>
   </mj-column>
-</mj-section>
-`;
+</mj-section>`;
 
 const defaultOrderCreatedMjmlTemplate = `<mjml>
-  <mj-body>
-    ${brandLogoSection}
-    <mj-section>
-      <mj-column>
-        <mj-text font-size="16px">
-          Hello!
-        </mj-text>
-        <mj-text>
-          Order {{ order.number }} has been created.
-        </mj-text>
-      </mj-column>
-    </mj-section>
-    ${addressSection}
-    ${orderLinesSection}
+  <mj-head>
+    <mj-style>
+      .body-bg { background-color: #f4f4f5; }
+      .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+    </mj-style>
+    <mj-attributes>
+      <mj-text font-family="Inter, Helvetica, Arial, sans-serif" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f4f4f5">
+    <mj-section padding="20px 0"></mj-section>
+    <mj-wrapper background-color="#ffffff" padding="40px 0" border-radius="12px" css-class="card-shadow">
+      ${brandLogoSection}
+      <mj-section padding="0px 24px 32px 24px">
+        <mj-column>
+          <mj-text font-size="24px" font-weight="700" align="center" color="#18181b" padding-bottom="8px">
+            Order Confirmed
+          </mj-text>
+          <mj-text font-size="16px" align="center" color="#52525b">
+            Thanks for your order! We've received order #{{ order.number }} and will begin processing it soon.
+          </mj-text>
+        </mj-column>
+      </mj-section>
+      ${addressSection}
+      ${orderLinesSection}
+    </mj-wrapper>
+    ${premiumFooterSection}
   </mj-body>
 </mjml>`;
 
-const defaultOrderFulfilledMjmlTemplate = `<mjml>
-  <mj-body>
-    ${brandLogoSection}
-    <mj-section>
-      <mj-column>
-        <mj-text font-size="16px">
-          Hello!
-        </mj-text>
-        <mj-text>
-          Order {{ order.number }} has been fulfilled.
-        </mj-text>
-      </mj-column>
-    </mj-section>
-    ${addressSection}
-    ${orderLinesSection}
-  </mj-body>
-</mjml>`;
+const defaultOrderConfirmedMjmlTemplate = defaultOrderCreatedMjmlTemplate;
 
-const defaultOrderConfirmedMjmlTemplate = `<mjml>
-  <mj-body>
-    ${brandLogoSection}
-    <mj-section>
-      <mj-column>
-        <mj-text font-size="16px">
-        Hello!
-        </mj-text>
-        <mj-text>
-          Order {{ order.number}} has been confirmed.
-        </mj-text>
-      </mj-column>
-    </mj-section>
-    ${addressSection}
-    ${orderLinesSection}
-    </mj-body>
-</mjml>`;
+const defaultOrderFulfilledMjmlTemplate = defaultOrderCreatedMjmlTemplate
+  .replace("Order Confirmed", "Order Fulfilled")
+  .replace("We've received order", "We've shipped order")
+  .replace("begin processing it soon", "it is on the way");
 
 const defaultOrderFullyPaidMjmlTemplate = `<mjml>
   <mj-body>
