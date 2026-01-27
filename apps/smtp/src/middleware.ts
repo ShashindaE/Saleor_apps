@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 export function middleware(request: NextRequest) {
     const requestHeaders = new Headers(request.headers);
@@ -14,8 +13,10 @@ export function middleware(request: NextRequest) {
         requestHeaders.set("saleor-domain", pmtradersDomain);
     }
 
-    // If we modified headers, return a response with those headers
-    // The downstream API routes will verify these headers.
+    /*
+     * If we modified headers, return a response with those headers
+     * The downstream API routes will verify these headers.
+     */
     return NextResponse.next({
         request: {
             headers: requestHeaders,

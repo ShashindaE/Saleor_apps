@@ -4,7 +4,7 @@ import * as trpcNext from "@trpc/server/adapters/next";
 
 import { getBaseUrl } from "../../lib/get-base-url";
 
-export const createTrpcContext = async ({ res, req }: trpcNext.CreateNextContextOptions) => {
+export const createTrpcContext = async ({ res: _res, req }: trpcNext.CreateNextContextOptions) => {
   const baseUrl = getBaseUrl(req.headers);
 
   return {
