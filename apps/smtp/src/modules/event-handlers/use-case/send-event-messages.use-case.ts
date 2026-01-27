@@ -266,6 +266,7 @@ export class SendEventMessagesUseCase {
       if (order && Array.isArray(order.lines)) {
         order.lines = order.lines.map((line: any) => {
           const isWeighted = line.variant?.product?.productType?.measurementType === "WEIGHTED";
+
           // eslint-disable-next-line no-console
           console.log(`[Enrich] Line: ${line.productName}, Variant: ${line.variant?.name}, Type: ${line.variant?.product?.productType?.measurementType}, IsWeighted: ${isWeighted}`);
 
