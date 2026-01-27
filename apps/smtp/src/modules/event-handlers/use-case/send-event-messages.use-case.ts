@@ -112,9 +112,11 @@ export class SendEventMessagesUseCase {
       );
     }
 
+    const enrichedPayload = this.enrichPayload(payload);
+
     const preparedEmailResult = this.deps.emailCompiler.compile({
       event: event,
-      payload: payload,
+      payload: enrichedPayload,
       recipientEmail: recipientEmail,
       bodyTemplate: eventSettings.template,
       subjectTemplate: eventSettings.subject,
@@ -254,5 +256,45 @@ export class SendEventMessagesUseCase {
     );
 
     return Result.combineWithAllErrors(processingResults);
+  }
+  private enrichPayload(payload: any): any {
+    const logoUrl = "https://pmtraders-storefront-production.up.railway.app/images/pmtraders-logo.png";
+
+    if (payload && typeof payload === "object" && "order" in payload) {
+      const order = (payload as any).order;
+
+      if (order && Array.isArray(order.lines)) {
+        order.lines = order.lines.map((line: any) => {
+          const isWeighted = line.variant?.product?.productType?.measurementType === "WEIGHTED";
+
+          const quantity = line.quantity ?? 0;
+          let formattedQuantity = quantity.toString();
+          if (isWeighted) {
+            const grams = quantity * 25;
+            if (grams >= 1000) {
+              const kg = grams / 1000;
+              formattedQuantity = kg % 1 === 0 ? `${kg}kg` : `${kg.toFixed(1)}kg`;
+            } else {
+              formattedQuantity = `${grams}g`;
+            }
+          }
+
+          return {
+            ...line,
+            formattedQuantity,
+          };
+        });
+      }
+
+      return {
+        ...payload,
+        logoUrl,
+      };
+    }
+
+    return {
+      ...(typeof payload === "object" ? payload : { data: payload }),
+      logoUrl,
+    };
   }
 }

@@ -98,6 +98,10 @@ fragment OrderDetails on Order {
         }
       }
       product {
+        productType {
+          measurementType
+          defaultUnit
+        }
         attributes {
           attribute {
             id
