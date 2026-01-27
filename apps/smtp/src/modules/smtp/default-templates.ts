@@ -87,7 +87,7 @@ const orderLinesSection = `<mj-section padding="0px 24px">
             {{ this.productName }} <span style="color: #71717a; font-weight: 400;">- {{ this.variantName }}</span>
           </td>
           <td style="padding: 12px 0; color: #18181b; font-size: 14px; text-align: right;">
-            {{ this.quantity }}
+            {{ this.formattedQuantity }}
           </td>
           <td style="padding: 12px 0; color: #18181b; font-size: 14px; text-align: right;">
              {{ this.totalPrice.gross.amount }} {{ this.totalPrice.gross.currency }}
