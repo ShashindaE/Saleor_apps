@@ -50,7 +50,7 @@ switch (aplType) {
       throw new Error("Missing required environment variables for Upstash APL configuration.");
     }
     apl = new UpstashAPL({
-      restUrl: process.env.UPSTASH_REDIS_REST_URL,
+      restURL: process.env.UPSTASH_REDIS_REST_URL,
       restToken: process.env.UPSTASH_REDIS_REST_TOKEN,
     });
 
