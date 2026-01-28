@@ -1,7 +1,7 @@
 FROM node:22-alpine AS builder
 
 # Enable pnpm
-RUN corepack enable && corepack prepare pnpm@10.2.1 --activate
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 
 WORKDIR /app
 
@@ -21,7 +21,7 @@ FROM node:22-alpine AS runner
 WORKDIR /app
 
 # Enable pnpm
-RUN corepack enable && corepack prepare pnpm@10.2.1 --activate
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 
 # Copy necessary files from builder
 COPY --from=builder /app/package.json /app/pnpm-workspace.yaml ./
