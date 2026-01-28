@@ -65,6 +65,7 @@ const handler: NextJsWebhookHandler<NotifySubscriptionPayload> = async (req, res
 
     if (!success) {
       logger.warn(`Rate limit exceeded for ${recipientEmail}`, { limit, reset, remaining });
+
       return res.status(429).json({ error: "Rate limit exceeded" });
     }
   }

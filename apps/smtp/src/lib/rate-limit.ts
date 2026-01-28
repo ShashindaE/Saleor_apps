@@ -3,9 +3,12 @@ import { Redis } from "@upstash/redis";
 
 // Ensure Redis instance is created only if env vars are present
 const redis =
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
     process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
         ? new Redis({
+            // eslint-disable-next-line turbo/no-undeclared-env-vars
             url: process.env.UPSTASH_REDIS_REST_URL,
+            // eslint-disable-next-line turbo/no-undeclared-env-vars
             token: process.env.UPSTASH_REDIS_REST_TOKEN,
         })
         : null;
