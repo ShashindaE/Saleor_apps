@@ -1,0 +1,20 @@
+e308133b fix(smtp): remove Billing Address & fix weighted items
+3a5033c5 fix(smtp): broaden weighted item detection to correct raw quantity display
+8f5abba2 fix(smtp): use formattedQuantity in templates for correct weight display
+698bc303 feat(smtp): implement premium card-style UI for order confirmation emails
+64eda9e2 fix(smtp): remove escape characters for logo template interpolation
+7f67d8f8 fix(smtp): add missing newline for lint compliance
+26705fd0 chore(smtp): add debug logs for weighted item detection
+5e3e6377 fix(smtp): overwrite quantity with formatted weight and add logo to default templates
+d90ae946 fix(smtp): resolve linting errors for Railway build
+56daa1c0 feat(smtp): add logo branding and weighted item formatting to emails
+bdf412ad Feat: Add FORCE_SMTP toggle for Railway Pro plans
+a0047935 Cleanup: Remove temporary debug metadata from use-case
+c5c510e6 Fix: Add Resend HTTP Bridge to bypass Railway SMTP block
+34e6fced Fix: Increase SMTP timeout to 10s and add connection logging
+8f0697d7 Fix: Add config ID and keys to InvalidSenderConfigError for debugging
+3a76a78a Fix: Expose error details for ServerError cases in webhooks
+8ee135da Fix: Expose detailed error in order-confirmed response
+cdd3ad82 Fix: Expose detailed error in order-created response for easier debugging
+26a7d99a Fix: Map Saleor event headers in middleware and restore use-case logic
+8cea05e8 Fix: Add detailed error logging for email sending failure diagnosis

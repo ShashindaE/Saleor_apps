@@ -21,6 +21,15 @@ const OrderConfirmedWebhookPayload = gql`
   fragment OrderConfirmedWebhookPayload on OrderConfirmed {
     order {
       ...OrderDetails
+      lines {
+        variant {
+          product {
+            productType {
+              measurementType
+            }
+          }
+        }
+      }
     }
   }
 `;
