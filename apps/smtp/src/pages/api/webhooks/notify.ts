@@ -4,6 +4,7 @@ import { withSpanAttributes } from "@saleor/apps-otel/src/with-span-attributes";
 import { captureException } from "@sentry/nextjs";
 
 import { notifyEventMapping, NotifySubscriptionPayload } from "../../../lib/notify-event-types";
+import { notifyRateLimiter } from "../../../lib/rate-limit";
 import { createLogger } from "../../../logger";
 import { loggerContext } from "../../../logger-context";
 import { SendEventMessagesUseCase } from "../../../modules/event-handlers/use-case/send-event-messages.use-case";
@@ -56,6 +57,16 @@ const handler: NextJsWebhookHandler<NotifySubscriptionPayload> = async (req, res
     logger.info(`The type of received notify event (${payload.notify_event}) is not supported.`);
 
     return res.status(200).json({ message: `${payload.notify_event} event is not supported.` });
+  }
+
+  // Rate Limiter Check
+  if (notifyRateLimiter) {
+    const { success, limit, reset, remaining } = await notifyRateLimiter.limit(recipientEmail);
+
+    if (!success) {
+      logger.warn(`Rate limit exceeded for ${recipientEmail}`, { limit, reset, remaining });
+      return res.status(429).json({ error: "Rate limit exceeded" });
+    }
   }
 
   const useCase = useCaseFactory.createFromAuthData(authData);
