@@ -9,7 +9,7 @@ WORKDIR /app
 COPY . .
 
 # Install dependencies (ignoring scripts to speed up)
-RUN pnpm install --frozen-lockfile --ignore-scripts
+RUN pnpm install --no-frozen-lockfile --ignore-scripts
 
 # Build the SMTP app
 # We filter by the package name found in apps/smtp/package.json which is "saleor-app-smtp"
