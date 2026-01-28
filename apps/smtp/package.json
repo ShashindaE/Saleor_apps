@@ -49,6 +49,7 @@
     "@trpc/next": "catalog:",
     "@trpc/react-query": "catalog:",
     "@trpc/server": "catalog:",
+    "@upstash/redis": "^1.28.0",
     "@vercel/otel": "catalog:",
     "@vitejs/plugin-react": "4.3.4",
     "dotenv": "catalog:",
