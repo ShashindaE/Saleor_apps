@@ -58,7 +58,7 @@ const orderLinesSection = `<mj-section padding="0px 24px">
       {{#each order.lines }}
         <tr style="border-bottom:1px solid #f4f4f5;">
           <td style="padding: 12px 0; color: #18181b; font-size: 14px; font-weight: 500;">
-            {{ this.productName }} <span style="color: #71717a; font-weight: 400;">- {{ this.variantName }}</span>
+             {{ this.productName }} <span style="color: #71717a; font-weight: 400; font-size: 13px;">({{ this.variantName }})</span>
           </td>
           <td style="padding: 12px 0; color: #18181b; font-size: 14px; text-align: right;">
             {{ this.formattedQuantity }}
@@ -177,141 +177,259 @@ const defaultOrderCancelledMjmlTemplate = `<mjml>
 </mjml>`;
 
 const defaultInvoiceSentMjmlTemplate = `<mjml>
-  <mj-body>
-    <mj-section>
-      <mj-column>
-        <mj-text font-size="16px">
-          Hi!
-        </mj-text>
-        <mj-text>
-          New invoice has been created
-        </mj-text>
-      </mj-column>
-    </mj-section>
+  <mj-head>
+    <mj-style>
+      .body-bg { background-color: #f4f4f5; }
+      .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+    </mj-style>
+    <mj-attributes>
+      <mj-text font-family="Inter, Helvetica, Arial, sans-serif" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f4f4f5">
+    <mj-section padding="20px 0"></mj-section>
+    <mj-wrapper background-color="#ffffff" padding="40px 0" border-radius="12px" css-class="card-shadow">
+      ${brandLogoSection}
+      <mj-section padding="0px 24px 24px 24px">
+        <mj-column>
+          <mj-text font-size="24px" font-weight="700" align="center" color="#18181b" padding-bottom="8px">
+            Invoice Ready
+          </mj-text>
+          <mj-text font-size="16px" align="center" color="#52525b">
+            Hi! A new invoice has been generated for your order.
+          </mj-text>
+          <!-- TODO: Add Invoice download link button if available in payload -->
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+    ${premiumFooterSection}
   </mj-body>
 </mjml>`;
 
 // TODO: Improve the template
 const defaultGiftCardSentMjmlTemplate = `<mjml>
-  <mj-body>
-    <mj-section>
-      <mj-column>
-        <mj-text font-size="16px">
-          Hi!
-        </mj-text>
-        <mj-text>
-          Heres your gift card
-        </mj-text>
-      </mj-column>
-    </mj-section>
+  <mj-head>
+    <mj-style>
+      .body-bg { background-color: #f4f4f5; }
+      .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+    </mj-style>
+    <mj-attributes>
+      <mj-text font-family="Inter, Helvetica, Arial, sans-serif" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f4f4f5">
+    <mj-section padding="20px 0"></mj-section>
+    <mj-wrapper background-color="#ffffff" padding="40px 0" border-radius="12px" css-class="card-shadow">
+      ${brandLogoSection}
+      <mj-section padding="0px 24px 24px 24px">
+        <mj-column>
+          <mj-text font-size="24px" font-weight="700" align="center" color="#18181b" padding-bottom="8px">
+            Here's your Gift Card!
+          </mj-text>
+          <mj-text font-size="16px" align="center" color="#52525b">
+            Hi there! You've received a gift card.
+          </mj-text>
+          <!-- TODO: Add Gift card details/code here when available in payload -->
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+    ${premiumFooterSection}
   </mj-body>
 </mjml>`;
 
 const defaultAccountConfirmationMjmlTemplate = `<mjml>
-  <mj-body>
-    <mj-section>
-      <mj-column>
-        <mj-text font-size="16px">
-          Hi {{user.first_name}}!
-        </mj-text>
-        <mj-text>
-          Your account has been created. Please follow the link to activate it: 
-        </mj-text>
-        <mj-button href="{{confirm_url}}"  background-color="black" color="white" padding-top="50px" inner-padding="20px" width="70%">
-            Activate the account 
-        </mj-button>
-      </mj-column>
-    </mj-section>
+  <mj-head>
+    <mj-style>
+      .body-bg { background-color: #f4f4f5; }
+      .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+    </mj-style>
+    <mj-attributes>
+      <mj-text font-family="Inter, Helvetica, Arial, sans-serif" />
+      <mj-button font-family="Inter, Helvetica, Arial, sans-serif" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f4f4f5">
+    <mj-section padding="20px 0"></mj-section>
+    <mj-wrapper background-color="#ffffff" padding="40px 0" border-radius="12px" css-class="card-shadow">
+      ${brandLogoSection}
+      <mj-section padding="0px 24px 24px 24px">
+        <mj-column>
+          <mj-text font-size="24px" font-weight="700" align="center" color="#18181b" padding-bottom="8px">
+            Welcome to PMTraders!
+          </mj-text>
+          <mj-text font-size="16px" align="center" color="#52525b" padding-bottom="24px">
+            Hi {{user.first_name}}! Thanks for creating an account. Please confirm your email address to get started.
+          </mj-text>
+          <mj-button href="{{confirm_url}}" background-color="#000000" color="#ffffff" font-weight="600" border-radius="8px" padding-top="24px" inner-padding="16px 32px">
+            Activate Account
+          </mj-button>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+    ${premiumFooterSection}
   </mj-body>
 </mjml>`;
 
 const defaultAccountPasswordResetMjmlTemplate = `<mjml>
-  <mj-body>
-    <mj-section>
-      <mj-column>
-        <mj-text font-size="16px">
-          Hi {{user.first_name}}!
-        </mj-text>
-        <mj-text>
-          Password reset has been requested. Please follow the link to proceed: 
-        </mj-text>
-        <mj-button href="{{reset_url}}"  background-color="black" color="white" padding-top="50px" inner-padding="20px" width="70%">
-            Reset the password 
-        </mj-button>
-      </mj-column>
-    </mj-section>
+  <mj-head>
+    <mj-style>
+      .body-bg { background-color: #f4f4f5; }
+      .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+    </mj-style>
+    <mj-attributes>
+      <mj-text font-family="Inter, Helvetica, Arial, sans-serif" />
+      <mj-button font-family="Inter, Helvetica, Arial, sans-serif" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f4f4f5">
+    <mj-section padding="20px 0"></mj-section>
+    <mj-wrapper background-color="#ffffff" padding="40px 0" border-radius="12px" css-class="card-shadow">
+      ${brandLogoSection}
+      <mj-section padding="0px 24px 24px 24px">
+        <mj-column>
+          <mj-text font-size="24px" font-weight="700" align="center" color="#18181b" padding-bottom="8px">
+            Reset Your Password
+          </mj-text>
+          <mj-text font-size="16px" align="center" color="#52525b" padding-bottom="24px">
+            Hi {{user.first_name}}, we received a request to reset your password. If this was you, click the button below.
+          </mj-text>
+          <mj-button href="{{reset_url}}" background-color="#000000" color="#ffffff" font-weight="600" border-radius="8px" padding-top="24px" inner-padding="16px 32px">
+            Reset Password
+          </mj-button>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+    ${premiumFooterSection}
   </mj-body>
 </mjml>`;
 
 const defaultAccountChangeEmailRequestMjmlTemplate = `<mjml>
-  <mj-body>
-    <mj-section>
-      <mj-column>
-        <mj-text font-size="16px">
-          Hi {{user.first_name}}!
-        </mj-text>
-        <mj-text>
-          Email address change has been requested. If you want to confirm changing the email address to {{new_email}}, please follow the link: 
-        </mj-text>
-        <mj-button href="{{redirect_url}}"  background-color="black" color="white" padding-top="50px" inner-padding="20px" width="70%">
-            Change the email
-        </mj-button>
-      </mj-column>
-    </mj-section>
+  <mj-head>
+    <mj-style>
+      .body-bg { background-color: #f4f4f5; }
+      .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+    </mj-style>
+    <mj-attributes>
+      <mj-text font-family="Inter, Helvetica, Arial, sans-serif" />
+      <mj-button font-family="Inter, Helvetica, Arial, sans-serif" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f4f4f5">
+    <mj-section padding="20px 0"></mj-section>
+    <mj-wrapper background-color="#ffffff" padding="40px 0" border-radius="12px" css-class="card-shadow">
+      ${brandLogoSection}
+      <mj-section padding="0px 24px 24px 24px">
+        <mj-column>
+          <mj-text font-size="24px" font-weight="700" align="center" color="#18181b" padding-bottom="8px">
+            Confirm Email Change
+          </mj-text>
+          <mj-text font-size="16px" align="center" color="#52525b" padding-bottom="24px">
+            Hi {{user.first_name}}, you requested to change your email to <strong>{{new_email}}</strong>. Please confirm this change.
+          </mj-text>
+          <mj-button href="{{redirect_url}}" background-color="#000000" color="#ffffff" font-weight="600" border-radius="8px" padding-top="24px" inner-padding="16px 32px">
+            Confirm Change
+          </mj-button>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+    ${premiumFooterSection}
   </mj-body>
 </mjml>`;
 
 const defaultAccountChangeEmailConfirmationMjmlTemplate = `<mjml>
-  <mj-body>
-    <mj-section>
-      <mj-column>
-        <mj-text font-size="16px">
-          Hi {{user.first_name}}!
-        </mj-text>
-        <mj-text>
-          Email address change has been confirmed.
-        </mj-text>
-      </mj-column>
-    </mj-section>
+  <mj-head>
+    <mj-style>
+      .body-bg { background-color: #f4f4f5; }
+      .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+    </mj-style>
+    <mj-attributes>
+      <mj-text font-family="Inter, Helvetica, Arial, sans-serif" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f4f4f5">
+    <mj-section padding="20px 0"></mj-section>
+    <mj-wrapper background-color="#ffffff" padding="40px 0" border-radius="12px" css-class="card-shadow">
+      ${brandLogoSection}
+      <mj-section padding="0px 24px 24px 24px">
+        <mj-column>
+          <mj-text font-size="24px" font-weight="700" align="center" color="#18181b" padding-bottom="8px">
+            Email Change Confirmed
+          </mj-text>
+          <mj-text font-size="16px" align="center" color="#52525b">
+            Hi {{user.first_name}}, your email address has been successfully updated.
+          </mj-text>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+    ${premiumFooterSection}
   </mj-body>
 </mjml>`;
 
 const defaultAccountDeleteMjmlTemplate = `<mjml>
-  <mj-body>
-    <mj-section>
-      <mj-column>
-        <mj-text font-size="16px">
-          Hi {{user.first_name}}!
-        </mj-text>
-        <mj-text>
-          Account deletion has been requested. If you want to confirm, please follow the link: 
-        </mj-text>
-        <mj-button href="{{redirect_url}}"  background-color="black" color="white" padding-top="50px" inner-padding="20px" width="70%">
-            Delete the account
-        </mj-button>
-      </mj-column>
-    </mj-section>
+  <mj-head>
+    <mj-style>
+      .body-bg { background-color: #f4f4f5; }
+      .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+    </mj-style>
+    <mj-attributes>
+      <mj-text font-family="Inter, Helvetica, Arial, sans-serif" />
+      <mj-button font-family="Inter, Helvetica, Arial, sans-serif" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f4f4f5">
+    <mj-section padding="20px 0"></mj-section>
+    <mj-wrapper background-color="#ffffff" padding="40px 0" border-radius="12px" css-class="card-shadow">
+      ${brandLogoSection}
+      <mj-section padding="0px 24px 24px 24px">
+        <mj-column>
+          <mj-text font-size="24px" font-weight="700" align="center" color="#18181b" padding-bottom="8px">
+            Delete Account?
+          </mj-text>
+          <mj-text font-size="16px" align="center" color="#52525b" padding-bottom="24px">
+            Hi {{user.first_name}}, we received a request to delete your account. If this was you, please confirm by clicking the button below. This action cannot be undone.
+          </mj-text>
+          <mj-button href="{{redirect_url}}" background-color="#ef4444" color="#ffffff" font-weight="600" border-radius="8px" padding-top="24px" inner-padding="16px 32px">
+            Delete My Account
+          </mj-button>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+    ${premiumFooterSection}
   </mj-body>
 </mjml>`;
 
 const defaultOrderFulfillmentUpdatedMjmlTemplate = `<mjml>
-  <mj-body>
-    <mj-section>
-      <mj-column>
-        <mj-text font-size="16px">
-            Hello!
-        </mj-text>
-        <mj-text>
-          Fulfillment for the order {{ order.number }} has been updated.
-        </mj-text>
-        {{#if fulfillment.tracking_number }}
-          <mj-text>
-            Tracking number: {{ fulfillment.tracking_number }}
+  <mj-head>
+    <mj-style>
+      .body-bg { background-color: #f4f4f5; }
+      .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+    </mj-style>
+    <mj-attributes>
+      <mj-text font-family="Inter, Helvetica, Arial, sans-serif" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f4f4f5">
+    <mj-section padding="20px 0"></mj-section>
+    <mj-wrapper background-color="#ffffff" padding="40px 0" border-radius="12px" css-class="card-shadow">
+      ${brandLogoSection}
+      <mj-section padding="0px 24px 24px 24px">
+        <mj-column>
+          <mj-text font-size="24px" font-weight="700" align="center" color="#18181b" padding-bottom="8px">
+            Shipping Update
           </mj-text>
-        {{/if}}
-      </mj-column>
-    </mj-section>
-    ${addressSectionForNotify}
+          <mj-text font-size="16px" align="center" color="#52525b">
+             Fulfillment for order #{{ order.number }} has been updated.
+          </mj-text>
+          {{#if fulfillment.tracking_number }}
+            <mj-text font-size="16px" align="center" color="#52525b" padding-top="12px">
+              <strong>Tracking Number:</strong> {{ fulfillment.tracking_number }}
+            </mj-text>
+          {{/if}}
+        </mj-column>
+      </mj-section>
+      ${addressSectionForNotify}
+    </mj-wrapper>
+    ${premiumFooterSection}
   </mj-body>
 </mjml>`;
 
