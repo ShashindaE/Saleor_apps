@@ -46,7 +46,13 @@ switch (aplType) {
   }
 
   case "upstash":
-    apl = new UpstashAPL();
+    if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+      throw new Error("Missing required environment variables for Upstash APL configuration.");
+    }
+    apl = new UpstashAPL({
+      restUrl: process.env.UPSTASH_REDIS_REST_URL,
+      restToken: process.env.UPSTASH_REDIS_REST_TOKEN,
+    });
 
     break;
 
