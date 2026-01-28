@@ -20,22 +20,9 @@ const premiumFooterSection = `<mj-section padding-top="40px" padding-bottom="24p
 </mj-section>`;
 
 const addressSection = `<mj-section padding="0px 24px 24px 24px">
-  <mj-column width="48%">
-    <mj-text font-weight="bold" font-size="14px" color="#18181b" padding-bottom="8px">Billing Address</mj-text>
-    <mj-text font-size="14px" color="#52525b" line-height="1.5">
-      {{#if order.billingAddress}}
-        {{ order.billingAddress.streetAddress1 }}<br/>
-        {{ order.billingAddress.city }} {{ order.billingAddress.postalCode }}
-      {{else}}
-        No billing address
-      {{/if}}
-    </mj-text>
-  </mj-column>
-  <mj-column width="4%">
-  </mj-column>
-  <mj-column width="48%">
-    <mj-text font-weight="bold" font-size="14px" color="#18181b" padding-bottom="8px">Shipping Address</mj-text>
-    <mj-text font-size="14px" color="#52525b" line-height="1.5">
+  <mj-column width="100%">
+    <mj-text font-weight="bold" font-size="14px" color="#18181b" padding-bottom="8px" align="center">Shipping Address</mj-text>
+    <mj-text font-size="14px" color="#52525b" line-height="1.5" align="center">
       {{#if order.shippingAddress}}
         {{ order.shippingAddress.streetAddress1}}<br/>
         {{ order.shippingAddress.city }} {{ order.shippingAddress.postalCode }}
@@ -47,22 +34,9 @@ const addressSection = `<mj-section padding="0px 24px 24px 24px">
 </mj-section>`;
 
 const addressSectionForNotify = `<mj-section padding="0px 24px 24px 24px">
-  <mj-column width="48%">
-    <mj-text font-weight="bold" font-size="14px" color="#18181b" padding-bottom="8px">Billing Address</mj-text>
-    <mj-text font-size="14px" color="#52525b" line-height="1.5">
-      {{#if order.billing_address}}
-        {{ order.billing_address.street_address_1 }}<br/>
-        {{ order.billing_address.city }} {{ order.billing_address.postal_code }}
-      {{else}}
-        No billing address
-      {{/if}}
-    </mj-text>
-  </mj-column>
-  <mj-column width="4%">
-  </mj-column>
-  <mj-column width="48%">
-    <mj-text font-weight="bold" font-size="14px" color="#18181b" padding-bottom="8px">Shipping Address</mj-text>
-    <mj-text font-size="14px" color="#52525b" line-height="1.5">
+  <mj-column width="100%">
+    <mj-text font-weight="bold" font-size="14px" color="#18181b" padding-bottom="8px" align="center">Shipping Address</mj-text>
+    <mj-text font-size="14px" color="#52525b" line-height="1.5" align="center">
       {{#if order.shipping_address}}
         {{ order.shipping_address.street_address_1}}<br/>
         {{ order.shipping_address.city }} {{ order.shipping_address.postal_code }}
@@ -130,7 +104,7 @@ const defaultOrderCreatedMjmlTemplate = `<mjml>
             Order Confirmed
           </mj-text>
           <mj-text font-size="16px" align="center" color="#52525b">
-            Thanks for your order! We've received order #{{ order.number }} and will begin processing it soon.
+            Hi {{#if order.billingAddress.firstName}}{{ order.billingAddress.firstName }}{{else}}there{{/if}}! Thanks for your order! We've received order #{{ order.number }} and will begin processing it soon.
           </mj-text>
         </mj-column>
       </mj-section>
