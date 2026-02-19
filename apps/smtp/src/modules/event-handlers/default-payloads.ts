@@ -376,7 +376,7 @@ const accountSetStaffPasswordPayload: NotifyPayloadAccountSetStaffPassword = {
   },
   recipient_email: "staff@example.com",
   token: "bmt4kc-d6e379b762697f6aa357527af36bb9f6",
-  redirect_url:
+  password_set_url:
     "http://example.com/new-password/?email=staff%40example.com&token=bmt4kc-d6e379b762697f6aa357527af36bb9f6",
   channel_slug: "default-channel",
   domain: "demo.saleor.cloud",

@@ -93,7 +93,7 @@ export interface NotifyPayloadAccountSetStaffPassword {
   domain: string;
   logo_url: string;
   recipient_email: string;
-  redirect_url: string;
+  password_set_url: string;
   site_name: string;
   token: string;
   user: User;

@@ -456,7 +456,7 @@ const defaultAccountSetStaffPasswordMjmlTemplate = `<mjml>
           <mj-text font-size="16px" align="center" color="#52525b" padding-bottom="24px">
             Hi{{#if user.first_name}} {{user.first_name}}{{/if}}, you've been invited to join the PMTraders team! Please set your password to get started.
           </mj-text>
-          <mj-button href="{{redirect_url}}" background-color="#000000" color="#ffffff" font-weight="600" border-radius="8px" padding-top="24px" inner-padding="16px 32px">
+          <mj-button href="{{password_set_url}}" background-color="#000000" color="#ffffff" font-weight="600" border-radius="8px" padding-top="24px" inner-padding="16px 32px">
             Set Password
           </mj-button>
         </mj-column>
