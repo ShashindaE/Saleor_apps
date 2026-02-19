@@ -5,6 +5,7 @@ export const notifyEventMapping: Record<string, MessageEventTypes> = {
   account_confirmation: "ACCOUNT_CONFIRMATION",
   account_delete: "ACCOUNT_DELETE",
   account_password_reset: "ACCOUNT_PASSWORD_RESET",
+  account_set_staff_password: "ACCOUNT_SET_STAFF_PASSWORD",
   account_change_email_request: "ACCOUNT_CHANGE_EMAIL_REQUEST",
   account_change_email_confirm: "ACCOUNT_CHANGE_EMAIL_CONFIRM",
   order_fulfillment_update: "ORDER_FULFILLMENT_UPDATE",
@@ -24,31 +25,35 @@ interface Meta {
 export type NotifySubscriptionPayload = {
   meta: Meta;
 } & (
-  | {
+    | {
       notify_event: "account_confirmation";
       payload: NotifyPayloadAccountConfirmation;
     }
-  | {
+    | {
       notify_event: "account_delete";
       payload: NotifyPayloadAccountDelete;
     }
-  | {
+    | {
       notify_event: "account_password_reset";
       payload: NotifyPayloadAccountPasswordReset;
     }
-  | {
+    | {
       notify_event: "account_change_email";
       payload: NotifyPayloadAccountChangeEmailRequest;
     }
-  | {
+    | {
       notify_event: "account_change_email_confirm";
       payload: NotifyPayloadAccountChangeEmailConfirmation;
     }
-  | {
+    | {
       notify_event: "order_fulfillment_update";
       payload: NotifyPayloadFulfillmentUpdate;
     }
-);
+    | {
+      notify_event: "account_set_staff_password";
+      payload: NotifyPayloadAccountSetStaffPassword;
+    }
+  );
 
 export interface NotifyPayloadAccountConfirmation {
   channel_slug: string;
@@ -78,6 +83,17 @@ export interface NotifyPayloadAccountPasswordReset {
   logo_url: string;
   recipient_email: string;
   reset_url: string;
+  site_name: string;
+  token: string;
+  user: User;
+}
+
+export interface NotifyPayloadAccountSetStaffPassword {
+  channel_slug: string;
+  domain: string;
+  logo_url: string;
+  recipient_email: string;
+  redirect_url: string;
   site_name: string;
   token: string;
   user: User;

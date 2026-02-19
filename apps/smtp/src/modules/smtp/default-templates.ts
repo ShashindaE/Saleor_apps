@@ -433,12 +433,46 @@ const defaultOrderFulfillmentUpdatedMjmlTemplate = `<mjml>
   </mj-body>
 </mjml>`;
 
+const defaultAccountSetStaffPasswordMjmlTemplate = `<mjml>
+  <mj-head>
+    <mj-style>
+      .body-bg { background-color: #f4f4f5; }
+      .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+    </mj-style>
+    <mj-attributes>
+      <mj-text font-family="Inter, Helvetica, Arial, sans-serif" />
+      <mj-button font-family="Inter, Helvetica, Arial, sans-serif" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f4f4f5">
+    <mj-section padding="20px 0"></mj-section>
+    <mj-wrapper background-color="#ffffff" padding="40px 0" border-radius="12px" css-class="card-shadow">
+      ${brandLogoSection}
+      <mj-section padding="0px 24px 24px 24px">
+        <mj-column>
+          <mj-text font-size="24px" font-weight="700" align="center" color="#18181b" padding-bottom="8px">
+            Set Your Password
+          </mj-text>
+          <mj-text font-size="16px" align="center" color="#52525b" padding-bottom="24px">
+            Hi{{#if user.first_name}} {{user.first_name}}{{/if}}, you've been invited to join the PMTraders team! Please set your password to get started.
+          </mj-text>
+          <mj-button href="{{redirect_url}}" background-color="#000000" color="#ffffff" font-weight="600" border-radius="8px" padding-top="24px" inner-padding="16px 32px">
+            Set Password
+          </mj-button>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+    ${premiumFooterSection}
+  </mj-body>
+</mjml>`;
+
 export const defaultMjmlTemplates: Record<MessageEventTypes, string> = {
   ACCOUNT_CHANGE_EMAIL_CONFIRM: defaultAccountChangeEmailConfirmationMjmlTemplate,
   ACCOUNT_CHANGE_EMAIL_REQUEST: defaultAccountChangeEmailRequestMjmlTemplate,
   ACCOUNT_CONFIRMATION: defaultAccountConfirmationMjmlTemplate,
   ACCOUNT_DELETE: defaultAccountDeleteMjmlTemplate,
   ACCOUNT_PASSWORD_RESET: defaultAccountPasswordResetMjmlTemplate,
+  ACCOUNT_SET_STAFF_PASSWORD: defaultAccountSetStaffPasswordMjmlTemplate,
   GIFT_CARD_SENT: defaultGiftCardSentMjmlTemplate,
   INVOICE_SENT: defaultInvoiceSentMjmlTemplate,
   ORDER_CANCELLED: defaultOrderCancelledMjmlTemplate,
@@ -456,6 +490,7 @@ export const defaultMjmlSubjectTemplates: Record<MessageEventTypes, string> = {
   ACCOUNT_CONFIRMATION: "Account activation",
   ACCOUNT_DELETE: "Account deletion",
   ACCOUNT_PASSWORD_RESET: "Password reset request",
+  ACCOUNT_SET_STAFF_PASSWORD: "You've been invited to PMTraders",
   GIFT_CARD_SENT: "Gift card",
   INVOICE_SENT: "New invoice has been created",
   ORDER_CANCELLED: "Order {{ order.number }} has been cancelled",

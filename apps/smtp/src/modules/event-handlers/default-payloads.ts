@@ -15,6 +15,7 @@ import {
   NotifyPayloadAccountConfirmation,
   NotifyPayloadAccountDelete,
   NotifyPayloadAccountPasswordReset,
+  NotifyPayloadAccountSetStaffPassword,
   NotifyPayloadFulfillmentUpdate,
 } from "../../lib/notify-event-types";
 import { MessageEventTypes } from "./message-event-types";
@@ -361,6 +362,28 @@ const accountDeletePayload: NotifyPayloadAccountDelete = {
   logo_url: "",
 };
 
+const accountSetStaffPasswordPayload: NotifyPayloadAccountSetStaffPassword = {
+  user: {
+    id: "VXNlcjoxOTY=",
+    email: "staff@example.com",
+    first_name: "Jane",
+    last_name: "Staff",
+    is_staff: true,
+    is_active: true,
+    private_metadata: {},
+    metadata: {},
+    language_code: "en",
+  },
+  recipient_email: "staff@example.com",
+  token: "bmt4kc-d6e379b762697f6aa357527af36bb9f6",
+  redirect_url:
+    "http://example.com/new-password/?email=staff%40example.com&token=bmt4kc-d6e379b762697f6aa357527af36bb9f6",
+  channel_slug: "default-channel",
+  domain: "demo.saleor.cloud",
+  site_name: "Saleor e-commerce",
+  logo_url: "",
+};
+
 const orderLineMonospaceTeePayloadFragment: NotifyPayloadFulfillmentUpdate["order"]["lines"][0] = {
   id: "T3JkZXJMaW5lOjIwMDg4MmMzLWU3NjItNGE0NS05ZjUxLTUyZDAxYTE2ODZjOQ==",
   product: {
@@ -584,6 +607,7 @@ export const examplePayloads: Record<MessageEventTypes, any> = {
   ACCOUNT_CONFIRMATION: accountConfirmationPayload,
   ACCOUNT_DELETE: accountDeletePayload,
   ACCOUNT_PASSWORD_RESET: accountPasswordResetPayload,
+  ACCOUNT_SET_STAFF_PASSWORD: accountSetStaffPasswordPayload,
   GIFT_CARD_SENT: giftCardSentPayload,
   INVOICE_SENT: invoiceSentPayload,
   ORDER_CANCELLED: orderCancelledPayload,
